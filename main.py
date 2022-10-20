@@ -8,7 +8,7 @@ root = Tk()
 root.geometry('1430x700')
 root.resizable(0,0)
 #root.config(bg="")
-root.title('Sox')
+root.title('Sox-Control de Stock')
 
 
 #Conexion a la base de datos. 
@@ -26,10 +26,10 @@ def connectMe():
     except Exception as ex:
         print(ex)
 
+#Consulta la info en la base de datos y los muestra en forma de tabla. 
 def machineQuery():
     for i in tree.get_children():
         tree.delete(i)
-
     conexion = connectMe()
     cur = conexion.cursor()
     cur.execute(" SELECT DISTINCT (RTRIM(STA11.DESCRIPCIO) + ' - ' + STA11.DESC_ADIC) AS [DESCRIPCION]," +
@@ -50,7 +50,7 @@ def machineQuery():
     i=0
     for articulo in articulos:
         tree.insert("", i, text='', values=(articulo[0], articulo[1],articulo[2], articulo[3], articulo[4],
-                                            articulo[5], articulo[6], articulo[7], articulo[8], articulo[9]))
+                                            articulo[5], articulo[6], articulo[7], articulo[8], articulo[9], articulo[10]))
         i = i + 1
 
     conexion.close()
@@ -62,7 +62,6 @@ def query():
 
 
 #Configuraciones de la ventana y el arbol. 
-
 tree = ttk.Treeview(root, columns=('descripcion', 'cod_articulo','talle', 'familia', 'pedidos', 'cant_pedidos',
                                     'expedicion','depo_facturacion' ,'bolsas_linea', 'bolsas_tejeduria', 'medida' ))
                                 
@@ -71,12 +70,11 @@ scrollbarx.configure(command=tree.xview)
 tree.configure(xscrollcommand=scrollbarx.set)
 scrollbarx.pack(side=BOTTOM, fill=X)
 
-
-
-
-
 tree['show'] = 'headings'
 
+tree.column('talle', width=100, anchor=CENTER)
+tree.column('cant_pedidos', width=120)
+tree.column('expedicion', width=100)
 tree.heading('descripcion', text='Descripcion')
 tree.heading('cod_articulo', text='Codigo articulo')
 tree.heading('talle', text='Talle')
