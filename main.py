@@ -1,6 +1,7 @@
+from distutils.command.config import config
 from tkinter import*
 from tkinter import ttk
-from turtle import right, st
+from turtle import left, right, st, width
 import pyodbc
 
 
@@ -27,9 +28,10 @@ def connectMe():
         print(ex)
 
 #Consulta la info en la base de datos y los muestra en forma de tabla. 
-def machineQuery():
+def mainQuery():
     for i in tree.get_children():
         tree.delete(i)
+        print(i)
     conexion = connectMe()
     cur = conexion.cursor()
     cur.execute(" SELECT DISTINCT (RTRIM(STA11.DESCRIPCIO) + ' - ' + STA11.DESC_ADIC) AS [DESCRIPCION]," +
@@ -52,29 +54,46 @@ def machineQuery():
         tree.insert("", i, text='', values=(articulo[0], articulo[1],articulo[2], articulo[3], articulo[4],
                                             articulo[5], articulo[6], articulo[7], articulo[8], articulo[9], articulo[10]))
         i = i + 1
+        
 
     conexion.close()
+    return articulos
 
+def check(e):
+    typed = entry.get()
+    if typed == '':
+        data = datos
+    else:
+        data = []
+        for item in datos:
+            if typed.lower() in item.lower():
+                data.append(item)
+                print(data)
 
-#Metodo principal
+    
 def query():
-    machineQuery()
+    mainQuery()
+    
+#Frame para el filtro
+frame1 = Frame(root, height=200)
+frame1.pack(fill="x")
+frame1.config(borderwidth=10,highlightbackground="black", highlightthickness=1, bg="green")
+#Label, entry y button para el frame1
+label = Label(frame1, text="Ingresar codigo", bg="blue")
+label.pack(side= LEFT, anchor= W, pady=10, padx=10)
+entry = Entry(frame1)
+entry.pack(side=LEFT, anchor=W, pady=10, padx=10)
+button = Button(frame1, text="Mas informacion", bg="yellow")
+button.pack(side=RIGHT, anchor=E, pady=10, padx=10)
 
+columns = ['descripcion', 'cod_articulo','talle', 'familia', 'pedidos', 'cant_pedidos',
+            'expedicion','depo_facturacion' ,'bolsas_linea', 'bolsas_tejeduria', 'medida']
 
-#Configuraciones de la ventana y el arbol. 
-tree = ttk.Treeview(root, columns=('descripcion', 'cod_articulo','talle', 'familia', 'pedidos', 'cant_pedidos',
-                                    'expedicion','depo_facturacion' ,'bolsas_linea', 'bolsas_tejeduria', 'medida' ))
-                                
-scrollbarx = ttk.Scrollbar(root, orient=HORIZONTAL)
-scrollbarx.configure(command=tree.xview)
-tree.configure(xscrollcommand=scrollbarx.set)
-scrollbarx.pack(side=BOTTOM, fill=X)
+tree = ttk.Treeview(root, columns=columns, show='headings')
 
-tree['show'] = 'headings'
+tree.column('medida', width=100)
+tree.column('talle', width=100)
 
-tree.column('talle', width=100, anchor=CENTER)
-tree.column('cant_pedidos', width=120)
-tree.column('expedicion', width=100)
 tree.heading('descripcion', text='Descripcion')
 tree.heading('cod_articulo', text='Codigo articulo')
 tree.heading('talle', text='Talle')
@@ -87,11 +106,26 @@ tree.heading('bolsas_linea', text='Bolsas en linea')
 tree.heading('bolsas_tejeduria', text='Bolsas en tejeduria')
 tree.heading('medida', text='Medida')
 
+tree.pack()
 
-tree.place(x=0, y=0, width=1430, height=600)
+scrollbarx = ttk.Scrollbar(root, orient=HORIZONTAL)
+scrollbarx.configure(command=tree.xview)
+tree.configure(xscrollcommand=scrollbarx.set)
+scrollbarx.pack(side=BOTTOM, fill="x")
+
+scrollbary = ttk.Scrollbar(root, orient=VERTICAL)
+scrollbary.configure(command=tree.yview)
+tree.configure(yscrollcommand=scrollbary.set)
+scrollbary.pack(side= RIGHT, fill=Y, ipady=40)
 
 
-query()
+tree.place(x=50, y=100,width=1300, height=500)
+
+entry.bind("<KeyRelease>", check)
+
+
+datos = mainQuery()
+entry.bind("<KeyRelease>", check)
 
 root.mainloop()
 
