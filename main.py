@@ -35,7 +35,7 @@ def mainQuery():
         print(i)
     conexion = connectMe()
     cur = conexion.cursor()
-    """
+    
     cur.execute(" SELECT DISTINCT (RTRIM(STA11.DESCRIPCIO) + ' - ' + STA11.DESC_ADIC) AS [DESCRIPCION]," +
                  "STA11.COD_ARTICU AS [COD ARTICULO] ,STA11.VALOR1 AS [TALLE]," +
                  "(SELECT TOP 1 (CASE IDPARENT WHEN 2 THEN UPPER(LTRIM(SUBSTRING(DESCRIP, 5, LEN(DESCRIP)))) WHEN 49 THEN ('SUBLIMADO - ' + UPPER(LTRIM(DESCRIP))) ELSE 'SIN DEFINIR' END) "+
@@ -72,6 +72,7 @@ def mainQuery():
                 "AND STA11.DESCRIPCIO NOT LIKE '%NO USAR%' "+
                 "AND CATALOGO.IDFOLDER = 90 "+
                 "AND STA11.USA_ESC = 'S' ")
+    """
     articulos = cur.fetchall()
 
     i=0
@@ -140,9 +141,9 @@ def query():
 #Frame para el filtro
 frame1 = Frame(root, height=200)
 frame1.pack(fill="x")
-frame1.config(borderwidth=10,highlightbackground="black", highlightthickness=1, bg="green")
+frame1.config(borderwidth=10,highlightbackground="black", highlightthickness=1)
 #Label, entry y button para frame1
-label = Label(frame1, text="Ingresar codigo", bg="blue")
+label = Label(frame1, text="Ingresar codigo")
 label.pack(side= LEFT, anchor= W, pady=10, padx=10)
 
 entry_var = StringVar()
@@ -164,12 +165,15 @@ for i in columns:
     tree.heading(i, text=i.capitalize())
 tree["show"] = "headings"
 tree.pack()
-tree.place(x=50, y=100,width=1300, height=500)
+tree.place(x=50, y=100,width=1300, height=550)
 tree.column('Descripcion', width=350)
-tree.column('Talle', width=100)
-tree.column('Medida', width=80)
-tree.column('Cantidad pedidos', width=100)
-tree.column('Expedicion', width=80)
+tree.column('Talle', width=100, anchor=CENTER)
+tree.column('Medida', width=80, anchor=CENTER)
+tree.column('Cantidad pedidos', width=100, anchor=CENTER)
+tree.column('Expedicion', width=80, anchor=CENTER)
+tree.column('Bolsas en linea', width=90, anchor=CENTER)
+tree.column('Bolsas en tejeduria', width=100, anchor=CENTER)
+tree.column('Pedidos', width=120, anchor=CENTER)
 
 tree.bind('<Double-1>', moreInformation)
 
