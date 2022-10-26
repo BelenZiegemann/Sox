@@ -89,10 +89,11 @@ def filterFirstName(*args):
     print("search",search)
     print(search_ent_var.get())
     for eachItem in ItemsOnTreeview:
-        print("mytree.item(eachitem)",myTree.item(eachItem)['values'][2])
+        print("mytree.item(eachitem)",myTree.item(eachItem)['values'][1])
         print("antes del if")
         myTree.selection_remove(*myTree.selection())
-        if search.lower() in myTree.item(eachItem)['values'][2]:
+        print("search lower: ", search)
+        if search.lower() in myTree.item(eachItem)['values'][1]:
             print("entro al if")
             print(myTree.item(eachItem)['values'][2])
             search_var = myTree.item(eachItem)['values']
@@ -121,7 +122,7 @@ data = [
     (2, '123456', 'pepe', '11 de julio'),
     (3, '123456', 'martin', '11 de julio'),
     (4, '123456', 'estela', '11 de julio'),
-    (5, '123456', 'eric', '11 de julio'),
+    (5, '666666', 'eric', '11 de julio'),
     (6, '123456', 'toto', '11 de julio'),
     (7, '123456', 'pablo', '11 de julio'),
     (8, '123456', 'feli', '11 de julio'),
