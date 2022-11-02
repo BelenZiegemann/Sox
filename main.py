@@ -1,9 +1,10 @@
 from distutils.command.config import config
 from hashlib import new
-from tkinter import*
+from tkinter import *
 from tkinter import ttk
 from turtle import heading, left, right, st, width
 import pyodbc
+import articulo
 
 
 root = Tk()
@@ -36,50 +37,18 @@ def mainQuery():
     conexion = connectMe()
     cur = conexion.cursor()
     
-    cur.execute(" SELECT DISTINCT (RTRIM(STA11.DESCRIPCIO) + ' - ' + STA11.DESC_ADIC) AS [DESCRIPCION]," +
-                 "STA11.COD_ARTICU AS [COD ARTICULO] ,STA11.VALOR1 AS [TALLE]," +
-                 "(SELECT TOP 1 (CASE IDPARENT WHEN 2 THEN UPPER(LTRIM(SUBSTRING(DESCRIP, 5, LEN(DESCRIP)))) WHEN 49 THEN ('SUBLIMADO - ' + UPPER(LTRIM(DESCRIP))) ELSE 'SIN DEFINIR' END) "+
-                 "FROM STA11ITC CLASIFICACION LEFT JOIN STA11FLD FOLDER ON CLASIFICACION.IDFOLDER = FOLDER.IDFOLDER WHERE (IDPARENT = 2 OR IDPARENT = 49) AND CLASIFICACION.CODE = COD_ARTICU) AS [FAMILIA]," +
-                 "ISNULL((SELECT SUM(CANT_PEN_D) FROM GVA03 DETALLEPEDIDO LEFT JOIN GVA21 PEDIDO ON DETALLEPEDIDO.NRO_PEDIDO = PEDIDO.NRO_PEDIDO AND DETALLEPEDIDO.TALON_PED = PEDIDO.TALON_PED WHERE DETALLEPEDIDO.COD_ARTICU = STA11.COD_ARTICU AND PEDIDO.FECHA_INGRESO > DATEADD(DD, -65, GETDATE()) AND PEDIDO.ESTADO IN (1,2) AND PEDIDO.COD_CLIENT NOT IN ('002042','Z02042','227') GROUP BY DETALLEPEDIDO.COD_ARTICU), 0) AS [PEDIDOS],"+
-                 "ISNULL((SELECT COUNT(DISTINCT PEDIDO.NRO_PEDIDO) FROM GVA03 DETALLEPEDIDO LEFT JOIN GVA21 PEDIDO ON DETALLEPEDIDO.NRO_PEDIDO = PEDIDO.NRO_PEDIDO AND DETALLEPEDIDO.TALON_PED = PEDIDO.TALON_PED WHERE DETALLEPEDIDO.COD_ARTICU = STA11.COD_ARTICU AND PEDIDO.FECHA_INGRESO > DATEADD(DD, -65, GETDATE()) AND PEDIDO.ESTADO IN (1,2) AND PEDIDO.COD_CLIENT NOT IN ('002042','Z02042', '227') AND DETALLEPEDIDO.CANT_PEN_D > 0 GROUP BY DETALLEPEDIDO.COD_ARTICU), 0) AS [CANT_PEDIDOS],"+
-                 "ISNULL((SELECT CONVERT(INT,CANT_STOCK) FROM STA19 WHERE COD_ARTICU = STA11.COD_ARTICU AND COD_DEPOSI = '30'), 0) AS [EXPEDICION], ISNULL((SELECT CANT_STOCK FROM STA19 WHERE COD_ARTICU = STA11.COD_ARTICU AND COD_DEPOSI = '90'), 0) AS [DEPOSITO FACTURACION],"+
-                 "ISNULL((SELECT CONVERT(INT, MIN(CANT_STOCK)/MAX(STA03.CANTIDAD)) FROM STA19 INNER JOIN STA03 ON STA19.COD_ARTICU = STA03.COD_INSUMO WHERE COD_DEPOSI = '20' AND STA03.COD_ARTICU = STA11.COD_ARTICU),0) AS [BOLSAS_POSIBLES_LINEA],"+
-                 "ISNULL((SELECT MIN(CANT_STOCK) FROM STA19 INNER JOIN STA03 ON STA19.COD_ARTICU = STA03.COD_INSUMO WHERE COD_DEPOSI = '10' AND STA03.COD_ARTICU = STA11.COD_ARTICU),0) AS [BOLSAS_POSIBLES_TEJEDURIA],"+
-                 "(SELECT COD_MEDIDA FROM MEDIDA WHERE ID_MEDIDA = STA11.ID_MEDIDA_STOCK) AS [MEDIDA]"+
-                 "FROM STA11 WHERE STA11.COD_ARTICU LIKE 'S%'AND STA11.DESCRIPCIO NOT LIKE '%NO USAR%' AND USA_ESC = 'S' AND STA11.COD_ARTICU <> 'SERVICIO' "+
-                 "GROUP BY STA11.COD_ARTICU, STA11.DESCRIPCIO, STA11.VALOR1, STA11.DESC_ADIC, STA11.ID_MEDIDA_STOCK ORDER BY [BOLSAS_POSIBLES_LINEA] DESC ")
-    """
-    cur.execute("SELECT STA11.COD_ARTICU, (RTRIM(STA11.DESCRIPCIO) + ' - ' + RTRIM(STA11.DESC_ADIC)) AS [DESCRIPCION], "+
-                "ISNULL(STOCKEXP.CANT_STOCK, 0) AS [STOCKEXPEDICION],"+
-                "ISNULL(STOCKRES.CANT_STOCK, 0) AS [STOCKRESERVADO], "+
-                "INSUMOS.COD_INSUMO AS [INSUMOLINEA], "+
-                "(RTRIM(ARTICULOLINEA.DESCRIPCIO) + ' - ' + RTRIM(ARTICULOLINEA.DESC_ADIC)) AS [DESCRIPCIONINSUMO], "+
-                "ISNULL(STOCKLINEA.CANT_STOCK, 0) AS [STOCKLINEA],"+
-                "INSUMOSTEJEDURIA.COD_INSUMO AS [INSUMOTEJEDURIA], "+
-                "(RTRIM(ARTICULOTEJEDURIA.DESCRIPCIO) + ' - ' + RTRIM(ARTICULOTEJEDURIA.DESC_ADIC)) AS [DESCRIPCIONINSUMOTEJ], "+
-                "ISNULL(STOCKTEJEDURIA.CANT_STOCK, 0) AS [STOCKTEJEDURIA]"+
-                "FROM STA11ITC CATALOGO"+
-                "INNER JOIN STA11 ON CATALOGO.CODE = STA11.COD_ARTICU"+
-                "LEFT JOIN STA19 STOCKEXP ON STOCKEXP.COD_ARTICU = STA11.COD_ARTICU AND STOCKEXP.COD_DEPOSI = '30'"+
-                "LEFT JOIN STA19 STOCKRES ON STOCKRES.COD_ARTICU = STA11.COD_ARTICU AND STOCKRES.COD_DEPOSI = '90'"+
-                "LEFT JOIN STA03 INSUMOS ON INSUMOS.COD_ARTICU = STA11.COD_ARTICU AND COD_INSUMO LIKE 'L%' "+
-                "LEFT JOIN STA19 STOCKLINEA ON STOCKLINEA.COD_ARTICU = INSUMOS.COD_INSUMO AND STOCKLINEA.COD_DEPOSI = '20' "+
-                "LEFT JOIN STA11 ARTICULOLINEA ON ARTICULOLINEA.COD_ARTICU = INSUMOS.COD_INSUMO "+
-                "LEFT JOIN STA03 INSUMOSTEJEDURIA ON INSUMOSTEJEDURIA.COD_ARTICU = INSUMOS.COD_INSUMO AND INSUMOSTEJEDURIA.COD_INSUMO LIKE 'T%' "+
-                "LEFT JOIN STA19 STOCKTEJEDURIA ON STOCKTEJEDURIA.COD_ARTICU = INSUMOSTEJEDURIA.COD_INSUMO AND STOCKTEJEDURIA.COD_DEPOSI = '10' "+
-                "LEFT JOIN STA11 ARTICULOTEJEDURIA ON ARTICULOTEJEDURIA.COD_ARTICU = INSUMOSTEJEDURIA.COD_INSUMO "+
-                "WHERE STA11.COD_ARTICU LIKE 'S%' "+
-                "AND STA11.DESCRIPCIO NOT LIKE '%NO USAR%' "+
-                "AND CATALOGO.IDFOLDER = 90 "+
-                "AND STA11.USA_ESC = 'S' ")
-    """
+    cur.execute(" SELECT DESCRIPCION, VISTA.COD_ARTICU, CONVERT(INT,STOCKEXPEDICION), CONVERT(INT,STOCKRESERVADO), CONVERT(INT, (MIN(STOCKLINEA) / MAX(NECESITALINEA))) AS MAX_BOLSAS_POSIBLES_LINEA, "+
+                " ORDEN.fecha_prog, orden.cant "+
+                " FROM VW_STOCKCOMPLETOARTICULOS2 VISTA "+
+                " LEFT JOIN VW_ORDENFABRICACIONFUTURASOX2 ORDEN ON VISTA.COD_ARTICU = ORDEN.COD_ARTICU "+
+                " GROUP BY DESCRIPCION, VISTA.COD_ARTICU, STOCKEXPEDICION, STOCKRESERVADO, ORDEN.fecha_prog, orden.cant ")
     articulos = cur.fetchall()
-
+    
     i=0
     for articulo in articulos:
-        tree.insert("", i, text='', values=(articulo[0], articulo[1],articulo[2], articulo[3], articulo[4],
-                                            articulo[5], articulo[6], articulo[7], articulo[8], articulo[9], articulo[10]))
+        tree.insert("", i, text='', values=(articulo[0], articulo[1],articulo[2], articulo[3], articulo[4],articulo[5], articulo[6]))
         i = i + 1
+    #print(articulos)
         
     conexion.close()
     return articulos
@@ -155,8 +124,8 @@ button = Button(frame1, text="Mas informacion", bg="yellow")
 button.pack(side=RIGHT, anchor=E, pady=10, padx=10)
 
 #Creo el arbol donde se mostrara la informacion.
-columns = ['Descripcion', 'Codigo articulo','Talle', 'Familia', 'Pedidos', 'Cantidad pedidos',
-            'Expedicion','Deposito facturacion' ,'Bolsas en linea', 'Bolsas en tejeduria', 'Medida']
+columns = ['Descripcion', 'Codigo articulo','Stock expedicion', 'Stock reservado', 
+            'Maximas bolsas posibles en linea','Fecha programada' ,'Cantidad']
 
 tree = ttk.Treeview(root)
 tree["columns"] = columns
@@ -166,15 +135,12 @@ for i in columns:
 tree["show"] = "headings"
 tree.pack()
 tree.place(x=50, y=100,width=1300, height=550)
-tree.column('Descripcion', width=350)
-tree.column('Talle', width=100, anchor=CENTER)
-tree.column('Medida', width=80, anchor=CENTER)
-tree.column('Cantidad pedidos', width=100, anchor=CENTER)
-tree.column('Expedicion', width=80, anchor=CENTER)
-tree.column('Bolsas en linea', width=90, anchor=CENTER)
-tree.column('Bolsas en tejeduria', width=100, anchor=CENTER)
-tree.column('Pedidos', width=120, anchor=CENTER)
-
+tree.column('Descripcion', width=310)
+tree.column('Codigo articulo', width=150)
+tree.column('Stock expedicion', width=100, anchor=CENTER)
+tree.column('Stock reservado', width=100, anchor=CENTER)
+tree.column('Maximas bolsas posibles en linea', width=160, anchor=CENTER)
+tree.column('Cantidad', width=100, anchor=CENTER)
 tree.bind('<Double-1>', moreInformation)
 
 #Creo los scrollbars para el arbol en root. 
