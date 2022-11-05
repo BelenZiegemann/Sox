@@ -1,10 +1,14 @@
+
+from asyncio.constants import LOG_THRESHOLD_FOR_CONNLOST_WRITES
 from distutils.command.config import config
 from hashlib import new
+from operator import truediv
 from tkinter import *
 from tkinter import ttk
+from traceback import print_tb
 from turtle import heading, left, right, st, width
 import pyodbc
-import articulo
+import articulo as art
 
 
 root = Tk()
@@ -12,6 +16,7 @@ root.geometry('1430x700')
 root.resizable(0,0)
 #root.config(bg="")
 root.title('Sox-Control de Stock')
+listArticulos = []
 
 
 #Conexion a la base de datos. 
@@ -29,14 +34,10 @@ def connectMe():
     except Exception as ex:
         print(ex)
 
-#Ejecuta la query. 
+
 def mainQuery():
-    for i in tree.get_children():
-        tree.delete(i)
-        print(i)
     conexion = connectMe()
     cur = conexion.cursor()
-    
     cur.execute(" SELECT DESCRIPCION, VISTA.COD_ARTICU, CONVERT(INT,STOCKEXPEDICION), CONVERT(INT,STOCKRESERVADO), CONVERT(INT, (MIN(STOCKLINEA) / MAX(NECESITALINEA))) AS MAX_BOLSAS_POSIBLES_LINEA, "+
                 " ORDEN.fecha_prog, orden.cant "+
                 " FROM VW_STOCKCOMPLETOARTICULOS2 VISTA "+
@@ -48,10 +49,57 @@ def mainQuery():
     for articulo in articulos:
         tree.insert("", i, text='', values=(articulo[0], articulo[1],articulo[2], articulo[3], articulo[4],articulo[5], articulo[6]))
         i = i + 1
-    #print(articulos)
-        
+    
     conexion.close()
     return articulos
+
+
+def auxQuery():
+    conexion = connectMe()
+    cur = conexion.cursor()
+    cur.execute(" SELECT * FROM VW_STOCKCOMPLETOARTICULOS2 ")
+    items = cur.fetchall()
+
+    for item in items:
+        auxS = item[0]
+        auxL = item[4]
+        #result = [e for e in listArticulos if e.cod_articulo==auxS]
+        #print("result: ", result)
+        resp = next((e for e in listArticulos if e.cod_articulo==auxS), NONE)
+        #print("resp: ", resp)
+        if resp is NONE:
+            print("Significa que el s NO existe. Creo el S: ", item[0])
+            artL = art.ArticuloL(item[4], item[5], item[7])
+            artT = art.ArticuloT(item[8], item[9], item[11])
+            artS = art.ArticuloS(item[0],item[1],item[2],item[3],item[6],item[10])
+            listArticulos.append(artS)
+        else:
+            print('El S existe y es: ', resp.cod_articulo)
+            resp2 = next((e for e in listArticulos if e.hijos.cod_articulo==auxL), NONE)
+            if resp2 is NONE:
+                print("El L NO existe")
+                
+            else:
+                print("El L existe")
+            
+
+            
+        
+    #for i in listArticulos:
+        #print(i)
+        #print(i.cod_articulo)
+        #print(i.hijos.cod_articulo)
+        #print(i.nietos.cod_articulo)
+        
+    conexion.close()
+    #print(listArticulos)
+    print(len(listArticulos))
+   
+
+def buscarPadre(itemS):
+    for i in listArticulos:
+        if i.cod_articulo == itemS:
+            return i        
 
 #Se ejecuta cada vez que se ingresa una letra por telclado.
 #Recorre todo el arbol buscando las coincidencias en la variable 'descripcion'
@@ -105,6 +153,7 @@ def moreInformation(event):
     
 def query():
     mainQuery()
+    auxQuery()
     
 #-----------------------------------------------------------------------------------------------------------------------------
 #Frame para el filtro

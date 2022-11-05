@@ -23,12 +23,12 @@ class ArticuloS(Articulo):
         self.stockReservado = stockR
         self.necesitaLinea = necesitaL
         self.necesitaTejedura = necesitaT
-    
-    def setHijos(self, hijo):
-        self.hijos.append(hijo)
 
-    def setNietos(self, nieto):
-        self.nietos.append(nieto)
+    
+    def agregarHijo(self,hijo):
+        self.hijos.append(hijo)
+    
+
 
 class ArticuloL(Articulo):
 
