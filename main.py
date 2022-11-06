@@ -1,5 +1,4 @@
 
-from asyncio.constants import LOG_THRESHOLD_FOR_CONNLOST_WRITES
 from distutils.command.config import config
 from hashlib import new
 from operator import truediv
@@ -70,37 +69,31 @@ def auxQuery():
         if resp is NONE:
             print("Significa que el s NO existe. Creo el S: ", item[0])
             artL = art.ArticuloL(item[4], item[5], item[7])
+            print("artl: ", artL)
             artT = art.ArticuloT(item[8], item[9], item[11])
-            artS = art.ArticuloS(item[0],item[1],item[2],item[3],item[6],item[10])
+            print("artt: ", artT)
+            artS = art.ArticuloS(item[0],item[1],item[2],item[3],item[6],item[10],artL,artT)
+            
             listArticulos.append(artS)
         else:
             print('El S existe y es: ', resp.cod_articulo)
-            resp2 = next((e for e in listArticulos if e.hijos.cod_articulo==auxL), NONE)
-            if resp2 is NONE:
-                print("El L NO existe")
-                
-            else:
-                print("El L existe")
+            artL = art.ArticuloL(item[4], item[5], item[7])
+            artS.agregarHijo(artL)
             
 
             
         
     #for i in listArticulos:
         #print(i)
-        #print(i.cod_articulo)
-        #print(i.hijos.cod_articulo)
-        #print(i.nietos.cod_articulo)
+        #print('S: ',i.cod_articulo)
+        #print('T: ',i.nietos.cod_articulo)
         
     conexion.close()
     #print(listArticulos)
     print(len(listArticulos))
    
 
-def buscarPadre(itemS):
-    for i in listArticulos:
-        if i.cod_articulo == itemS:
-            return i        
-
+        
 #Se ejecuta cada vez que se ingresa una letra por telclado.
 #Recorre todo el arbol buscando las coincidencias en la variable 'descripcion'
 # y los posiciona al principio del arbol ademas de destacar toda la fila con otro color. 
