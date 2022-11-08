@@ -72,15 +72,14 @@ def auxQuery():
     for item in items:
         auxS = item[0]
         auxL = item[4]
-        #print('Item: ', item[1],item[5],item[9])
         existS = next((e for e in listArticulos if e.cod_articulo==auxS), NONE)
         #print("resp: ", resp)
         if existS is NONE:
             #print("Significa que el s NO existe. Creo el S: ", item[1], item[0])
-            artL = art.ArticuloL(item[4], item[5], item[7])
-            #print("Creo el L: ", item[4])
             artT = art.ArticuloT(item[8], item[9], item[11])
-            #print("Creo el T: ", item[8])
+            #print("Creo el T: ", artT)
+            artL = art.ArticuloL(item[4], item[5], item[7], artT)
+            #print("Creo el L: ", artL)
             artS = art.ArticuloS(item[0],item[1],item[2],item[3],item[6],item[10],artL,artT)
             listArticulos.append(artS)
         else:
@@ -88,13 +87,19 @@ def auxQuery():
             existL = existeL(existS.hijos, auxL)
             if existL is NONE:
                 #print('El L NO existe. Lo creo: ', item[5])
-                artL = art.ArticuloL(item[4], item[5], item[7])
+                artT = art.ArticuloT(item[8], item[9], item[11])
+                artL = art.ArticuloL(item[4], item[5], item[7], artT)
                 existS.agregarHijo(artL)
+                #print("En el if: ", artL.hijos)
             #print('Creo el T: ', item[9])
-            artT = art.ArticuloT(item[8], item[9], item[11])
-            existS.agregarNieto(artT)
-            print('Los hijos de S son: ', existS.hijos)
-            print('Los nietos de S son: ', existS.nietos)
+            else:
+                #print("El L existe. Creo el T: ")
+                artT = art.ArticuloT(item[8], item[9], item[11])
+                existS.agregarNieto(artT)
+                existL.agregarHijo(artT)
+                #print("En el else: ", existL.hijos)
+            #print('Los hijos de S son: ', existS.hijos)
+            #print('Los nietos de S son: ', existS.nietos)
     print(len(listArticulos))
 
 #Busca en la lista de hijos de un dado articulo S.
@@ -151,33 +156,27 @@ def moreInformation(event):
         tree2.heading(i, text=i.capitalize())
     tree2["show"] = "headings"
     tree2.pack()
-    articuloS = buscarSelect(tree.item(item)['values'][1])
-    print(articuloS.cod_articulo)
-    print(articuloS.stockReservado)
-    for j in articuloS.hijos:
-        print("hijo insumo: ", j.cod_articulo)
-        print("hijo descrp: ", j.descripcion)
-        print("necesita linea: ", articuloS.necesitaLinea)
-        print("stock linea: ", j.stockLinea)
-    for h in articuloS.nietos:
-        print("nieto insumo: ", h.cod_articulo)
-        print("nieto descrp: ", h.descripcion)
-        print("necesita tejeduria: ", articuloS.necesitaTejeduria)
-        print("stock tejeduria: ", h.stockTejeduria)
-    i=0
-    for l in articuloS.nietos:
-        tree2.insert("", i, text='' ,values=('-', '-', '-', '-', l.cod_articulo, l.descripcion, articuloS.necesitaTejeduria, l.stockTejeduria))
-        i = i + 1
+    articuloL = buscarSelect(tree.item(item)['values'][1])
+    print("devuelta: ", articuloL)
+    i = 0
+    for l in articuloL:
+        print("hijo insumo: ", l.cod_articulo)
+        print("hijo descrp: ", l.descripcion)
+        print("hijos: ", l.hijos)
+        for t in l.hijos:
+            print("T: ", t.cod_articulo)
+            tree2.insert("", i, text='', values=(l.cod_articulo, l.descripcion, '-', l.stockLinea, t.cod_articulo, t.descripcion, '-', t.stockTejeduria))
+            i = i + 1
+
+
 
         
-
-
 
 #Busca el articulo S seleccionado en la lista de articulos. 
 def buscarSelect(select):
     for i in listArticulos:
         if i.cod_articulo == select:
-            return i
+            return i.hijos
             break
 
 #-----------------------------------------------------------------------------------------------------------------------------   

@@ -42,9 +42,15 @@ class ArticuloS(Articulo):
 
 class ArticuloL(Articulo):
 
-    def __init__(self, cod, des, stock):
+    hijos = []
+
+    def __init__(self, cod, des, stock, hijos):
         super().__init__(cod, des)
         self.stockLinea = stock
+        self.hijos = [hijos]
+        
+    def agregarHijo(self,hijo=[]):
+        self.hijos.append(hijo)
         
 
 class ArticuloT(Articulo):
