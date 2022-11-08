@@ -17,22 +17,24 @@ class ArticuloS(Articulo):
     hijos = []
     nietos = []
 
-    def __init__(self, cod, des, stockE, stockR, necesitaL, necesitaT, hijos, nietos=[]):
+    def __init__(self, cod, des, stockE, stockR, necesitaL, necesitaT, hijos, nietos):
         super().__init__(cod, des)
         self.stockExpedicion = stockE
         self.stockReservado = stockR
         self.necesitaLinea = necesitaL
         self.necesitaTejedura = necesitaT
         self.hijos = [hijos]
-        self.nietos = nietos
+        self.nietos = [nietos]
         print("self nietos",self.nietos)
         print("self hijos",self.hijos)
     
     def agregarHijo(self,hijo=[]):
-        print("hijo",hijo)
-        
         self.hijos.append(hijo)
-        print("hijos en agregar: ", self.hijos)
+        #print("hijos en agregar: ", self.hijos)
+    
+    def agregarNieto(self,nieto=[]):
+        self.nietos.append(nieto)
+        #print("nietos en agregar: ", self.nietos)
 
 
     def getHijos(self):
@@ -43,12 +45,10 @@ class ArticuloL(Articulo):
 
     def __init__(self, cod, des, stock):
         super().__init__(cod, des)
-        print("creo l")
         self.stockLinea = stock
 
 class ArticuloT(Articulo):
 
     def __init__(self, cod, des, stock):
         super().__init__(cod, des)
-        print("creo t")
         self.stockTejeduria = stock

@@ -56,41 +56,56 @@ def mainQuery():
 def auxQuery():
     conexion = connectMe()
     cur = conexion.cursor()
-    cur.execute(" SELECT * FROM VW_STOCKCOMPLETOARTICULOS2 ")
+    cur.execute(" SELECT * FROM VW_STOCKCOMPLETOARTICULOS2 WHERE DESCRIPCION LIKE 'DA246C - TALLE 3 SURTIDO'")
     items = cur.fetchall()
 
     for item in items:
         auxS = item[0]
         auxL = item[4]
+        print('Item: ', item[1],item[5],item[9])
         #result = [e for e in listArticulos if e.cod_articulo==auxS]
         #print("result: ", result)
         resp = next((e for e in listArticulos if e.cod_articulo==auxS), NONE)
         #print("resp: ", resp)
         if resp is NONE:
-            print("Significa que el s NO existe. Creo el S: ", item[0])
+            print("Significa que el s NO existe. Creo el S: ", item[1], item[0])
             artL = art.ArticuloL(item[4], item[5], item[7])
-            print("artl: ", artL)
+            print("Creo el L: ", item[4])
             artT = art.ArticuloT(item[8], item[9], item[11])
-            print("artt: ", artT)
+            print("Creo el T: ", item[8])
             artS = art.ArticuloS(item[0],item[1],item[2],item[3],item[6],item[10],artL,artT)
-            
             listArticulos.append(artS)
         else:
             print('El S existe y es: ', resp.cod_articulo)
-            artL = art.ArticuloL(item[4], item[5], item[7])
-            artS.agregarHijo(artL)
+            resp2 = existeL(resp.hijos, auxL)
+            if not resp2:
+                print('El L NO existe. Lo creo: ', item[5])
+                artL = art.ArticuloL(item[4], item[5], item[7])
+                resp.agregarHijo(artL)
+            print('Creo el T: ', item[9])
+            artT = art.ArticuloT(item[8], item[9], item[11])
+            resp.agregarNieto(artT)
+            print('Los hijos de S son: ', resp.hijos)
+            print('Los nietos de S son: ', resp.nietos)
             
-
-            
-        
+ 
     #for i in listArticulos:
         #print(i)
         #print('S: ',i.cod_articulo)
-        #print('T: ',i.nietos.cod_articulo)
-        
+        #for j in i.hijos:
+            #print('L: ',j.cod_articulo)        
     conexion.close()
     #print(listArticulos)
     print(len(listArticulos))
+
+def existeL(hijos, aux):
+    for i in hijos:
+        if i.cod_articulo==aux:
+            print('Existe L: ', i.cod_articulo)
+            return TRUE
+            break
+    return FALSE
+
    
 
         
