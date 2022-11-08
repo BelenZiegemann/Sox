@@ -84,7 +84,8 @@ def auxQuery():
             listArticulos.append(artS)
         else:
             #print('El S existe y es: ', existS.cod_articulo)
-            existL = existeL(existS.hijos, auxL)
+            #existL = existeL(existS.hijos, auxL)
+            existL = next((e for e in existS.hijos if e.cod_articulo==auxL), NONE)
             if existL is NONE:
                 #print('El L NO existe. Lo creo: ', item[5])
                 artT = art.ArticuloT(item[8], item[9], item[11])
@@ -102,15 +103,6 @@ def auxQuery():
             #print('Los nietos de S son: ', existS.nietos)
     print(len(listArticulos))
 
-#Busca en la lista de hijos de un dado articulo S.
-#Si hijo L existe, retorna TRUE. Caso contrario, retorna FALSE. 
-def existeL(hijos, aux):
-    for i in hijos:
-        if i.cod_articulo==aux:
-            print('Existe L: ', i)
-            return i
-            break
-    return NONE
    
 #Se ejecuta cada vez que se ingresa una letra por telclado.
 #Recorre todo el arbol de articulos buscando las coincidencias en la variable 'descripcion'
@@ -144,8 +136,8 @@ def moreInformation(event):
     newWindow.geometry('1400x300')    
     newWindow.grab_set()
     item = tree.focus()
-    print('lo que selecciono: ', tree.item(item)['values'][1])
     seleccionado = tree.item(item)['values'][1]
+    print('lo que selecciono: ', seleccionado)
     entry.delete(0, END)
     selectionsaux = []
     tree.selection_set(selectionsaux)
@@ -158,8 +150,8 @@ def moreInformation(event):
     tree2["show"] = "headings"
     tree2.pack()
     articuloS = next((e for e in listArticulos if e.cod_articulo==seleccionado), NONE)
-    print("El s: ", articuloS)
-    articuloL = buscarSelect(tree.item(item)['values'][1])
+    print("El s: ", articuloS.cod_articulo)
+    articuloL = buscarSelect(seleccionado)
     print("devuelta: ", articuloL)
     i = 0
     for l in articuloL:
