@@ -25,8 +25,6 @@ class ArticuloS(Articulo):
         self.necesitaTejeduria = necesitaT
         self.hijos = [hijos]
         self.nietos = [nietos]
-        #print("self nietos",self.nietos)
-        #print("self hijos",self.hijos)
     
     def agregarHijo(self,hijo=[]):
         self.hijos.append(hijo)
@@ -48,7 +46,7 @@ class ArticuloL(Articulo):
         super().__init__(cod, des)
         self.stockLinea = stock
         self.hijos = [hijos]
-        
+
     def agregarHijo(self,hijo=[]):
         self.hijos.append(hijo)
         

@@ -145,6 +145,7 @@ def moreInformation(event):
     newWindow.grab_set()
     item = tree.focus()
     print('lo que selecciono: ', tree.item(item)['values'][1])
+    seleccionado = tree.item(item)['values'][1]
     entry.delete(0, END)
     selectionsaux = []
     tree.selection_set(selectionsaux)
@@ -156,6 +157,8 @@ def moreInformation(event):
         tree2.heading(i, text=i.capitalize())
     tree2["show"] = "headings"
     tree2.pack()
+    articuloS = next((e for e in listArticulos if e.cod_articulo==seleccionado), NONE)
+    print("El s: ", articuloS)
     articuloL = buscarSelect(tree.item(item)['values'][1])
     print("devuelta: ", articuloL)
     i = 0
@@ -165,12 +168,9 @@ def moreInformation(event):
         print("hijos: ", l.hijos)
         for t in l.hijos:
             print("T: ", t.cod_articulo)
-            tree2.insert("", i, text='', values=(l.cod_articulo, l.descripcion, '-', l.stockLinea, t.cod_articulo, t.descripcion, '-', t.stockTejeduria))
+            tree2.insert("", i, text='', values=(l.cod_articulo, l.descripcion, articuloS.necesitaLinea, l.stockLinea, t.cod_articulo, t.descripcion, articuloS.necesitaTejeduria, t.stockTejeduria))
             i = i + 1
 
-
-
-        
 
 #Busca el articulo S seleccionado en la lista de articulos. 
 def buscarSelect(select):
