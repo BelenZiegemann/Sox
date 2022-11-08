@@ -2,6 +2,7 @@
 from distutils.command.config import config
 from hashlib import new
 from operator import truediv
+from time import process_time_ns
 from tkinter import *
 from tkinter import ttk
 from traceback import print_tb
@@ -15,16 +16,23 @@ root.geometry('1430x700')
 root.resizable(0,0)
 #root.config(bg="")
 root.title('Sox-Control de Stock')
+
+#Columnas para la tabla correspondiente a la ventana princiapl.
+columns = ['Descripcion', 'Codigo articulo','Stock expedicion', 'Stock reservado', 
+            'Maximas bolsas posibles en linea','Fecha programada' ,'Cantidad']
+#Columnas para la tabla correspondiente a la segunda ventana (o ventana que brinda mas informacion).
+columns2 = ['Insumo en Linea', 'Descripcion de insumo','Necesita linea', 'Stock en linea', 'Insumo tejeduria', 
+            'Descripcion insumo tejeduria', 'Necesita tejeduria']
+
 listArticulos = []
 
-
+#---------------------------------------------------------------------------------------------------------------------------------
 #Conexion a la base de datos. 
 def connectMe():
     server = 'localhost'
     bd = 'SOX_PIGUE_SA'
     user = 'sa'
     password = '#SQLserver2022'
-
     try:
         connection = pyodbc.connect('DRIVER={ODBC Driver 18 for SQL Server}; SERVER='+server+'; DATABASE='+bd+';UID='+user+'; pwd='+password+';TrustServerCertificate=yes;')
         print('conexion exitosa')
@@ -33,7 +41,7 @@ def connectMe():
     except Exception as ex:
         print(ex)
 
-
+#Crea la ventana principal en forma de arbol. Muestra informacion correspondiente a columns.
 def mainQuery():
     conexion = connectMe()
     cur = conexion.cursor()
@@ -43,75 +51,65 @@ def mainQuery():
                 " LEFT JOIN VW_ORDENFABRICACIONFUTURASOX2 ORDEN ON VISTA.COD_ARTICU = ORDEN.COD_ARTICU "+
                 " GROUP BY DESCRIPCION, VISTA.COD_ARTICU, STOCKEXPEDICION, STOCKRESERVADO, ORDEN.fecha_prog, orden.cant ")
     articulos = cur.fetchall()
-    
     i=0
     for articulo in articulos:
         tree.insert("", i, text='', values=(articulo[0], articulo[1],articulo[2], articulo[3], articulo[4],articulo[5], articulo[6]))
         i = i + 1
-    
     conexion.close()
     return articulos
 
-
+#Realiza la consulta a la base de datos. Por cada fila que retorna la consulta: si no existe el S lo crea. Si existe,
+#Consulta si existe su hijo L. Si existe L, solo crea los T. Si no existe, Crea L y T. 
+#Cada articulo S tiene una lista de hijos correspondientes a los articulos L y una lista de nietos correspondientes a los articulos T.
+#listArticulos es una lista que mantiene todos los objetos correspondientes a los articulos S. 
 def auxQuery():
     conexion = connectMe()
     cur = conexion.cursor()
-    cur.execute(" SELECT * FROM VW_STOCKCOMPLETOARTICULOS2 WHERE DESCRIPCION LIKE 'DA246C - TALLE 3 SURTIDO'")
+    cur.execute(" SELECT * FROM VW_STOCKCOMPLETOARTICULOS2 ")
     items = cur.fetchall()
+    conexion.close()
 
     for item in items:
         auxS = item[0]
         auxL = item[4]
-        print('Item: ', item[1],item[5],item[9])
-        #result = [e for e in listArticulos if e.cod_articulo==auxS]
-        #print("result: ", result)
-        resp = next((e for e in listArticulos if e.cod_articulo==auxS), NONE)
+        #print('Item: ', item[1],item[5],item[9])
+        existS = next((e for e in listArticulos if e.cod_articulo==auxS), NONE)
         #print("resp: ", resp)
-        if resp is NONE:
-            print("Significa que el s NO existe. Creo el S: ", item[1], item[0])
+        if existS is NONE:
+            #print("Significa que el s NO existe. Creo el S: ", item[1], item[0])
             artL = art.ArticuloL(item[4], item[5], item[7])
-            print("Creo el L: ", item[4])
+            #print("Creo el L: ", item[4])
             artT = art.ArticuloT(item[8], item[9], item[11])
-            print("Creo el T: ", item[8])
+            #print("Creo el T: ", item[8])
             artS = art.ArticuloS(item[0],item[1],item[2],item[3],item[6],item[10],artL,artT)
             listArticulos.append(artS)
         else:
-            print('El S existe y es: ', resp.cod_articulo)
-            resp2 = existeL(resp.hijos, auxL)
-            if not resp2:
-                print('El L NO existe. Lo creo: ', item[5])
+            #print('El S existe y es: ', existS.cod_articulo)
+            existL = existeL(existS.hijos, auxL)
+            if existL is NONE:
+                #print('El L NO existe. Lo creo: ', item[5])
                 artL = art.ArticuloL(item[4], item[5], item[7])
-                resp.agregarHijo(artL)
-            print('Creo el T: ', item[9])
+                existS.agregarHijo(artL)
+            #print('Creo el T: ', item[9])
             artT = art.ArticuloT(item[8], item[9], item[11])
-            resp.agregarNieto(artT)
-            print('Los hijos de S son: ', resp.hijos)
-            print('Los nietos de S son: ', resp.nietos)
-            
- 
-    #for i in listArticulos:
-        #print(i)
-        #print('S: ',i.cod_articulo)
-        #for j in i.hijos:
-            #print('L: ',j.cod_articulo)        
-    conexion.close()
-    #print(listArticulos)
+            existS.agregarNieto(artT)
+            print('Los hijos de S son: ', existS.hijos)
+            print('Los nietos de S son: ', existS.nietos)
     print(len(listArticulos))
 
+#Busca en la lista de hijos de un dado articulo S.
+#Si hijo L existe, retorna TRUE. Caso contrario, retorna FALSE. 
 def existeL(hijos, aux):
     for i in hijos:
         if i.cod_articulo==aux:
-            print('Existe L: ', i.cod_articulo)
-            return TRUE
+            print('Existe L: ', i)
+            return i
             break
-    return FALSE
-
+    return NONE
    
-
-        
 #Se ejecuta cada vez que se ingresa una letra por telclado.
-#Recorre todo el arbol buscando las coincidencias en la variable 'descripcion'
-# y los posiciona al principio del arbol ademas de destacar toda la fila con otro color. 
+#Recorre todo el arbol de articulos buscando las coincidencias en la variable 'descripcion'
+# y los posiciona al principio del arbol, ademas de destacar toda la fila con otro color. 
 def filter (*args):
     items = tree.get_children()
     selections = []
@@ -136,10 +134,9 @@ def filter (*args):
 #Crea un nuevo Treeview e inserta la nueva informacion. 
 def moreInformation(event):
     print("funciona")
-    
     newWindow = Toplevel(root)
-    newWindow.title('New')
-    newWindow.geometry('1300x600')    
+    newWindow.title('Informacion detallada-Sox')
+    newWindow.geometry('1400x300')    
     newWindow.grab_set()
     item = tree.focus()
     print('lo que selecciono: ', tree.item(item)['values'][1])
@@ -147,24 +144,49 @@ def moreInformation(event):
     selectionsaux = []
     tree.selection_set(selectionsaux)
     #Creo el arbol donde se mostrara la informacion.
-    columns = ['Descripcion', 'Codigo articulo','Talle', 'Familia', 'Pedidos', 'Cantidad pedidos',
-            'Expedicion','Deposito facturacion' ,'Bolsas en linea', 'Bolsas en tejeduria', 'Medida']
-
     tree2 = ttk.Treeview(newWindow)
-    tree2["columns"] = columns
-    for i in columns:
+    tree2["columns"] = columns2
+    for i in columns2:
         tree2.column(i)
         tree2.heading(i, text=i.capitalize())
     tree2["show"] = "headings"
     tree2.pack()
+    articuloS = buscarSelect(tree.item(item)['values'][1])
+    print(articuloS.cod_articulo)
+    print(articuloS.stockReservado)
+    for j in articuloS.hijos:
+        print("hijo insumo: ", j.cod_articulo)
+        print("hijo descrp: ", j.descripcion)
+        print("necesita linea: ", articuloS.necesitaLinea)
+        print("stock linea: ", j.stockLinea)
+    for h in articuloS.nietos:
+        print("nieto insumo: ", h.cod_articulo)
+        print("nieto descrp: ", h.descripcion)
+        print("necesita tejeduria: ", articuloS.necesitaTejeduria)
+        print("stock tejeduria: ", h.stockTejeduria)
+    i=0
+    for l in articuloS.nietos:
+        tree2.insert("", i, text='' ,values=('-', '-', '-', '-', l.cod_articulo, l.descripcion, articuloS.necesitaTejeduria, l.stockTejeduria))
+        i = i + 1
 
-    
+        
+
+
+
+#Busca el articulo S seleccionado en la lista de articulos. 
+def buscarSelect(select):
+    for i in listArticulos:
+        if i.cod_articulo == select:
+            return i
+            break
+
+#-----------------------------------------------------------------------------------------------------------------------------   
 def query():
     mainQuery()
     auxQuery()
     
 #-----------------------------------------------------------------------------------------------------------------------------
-#Frame para el filtro
+#Widgets para la ventana principal. 
 frame1 = Frame(root, height=200)
 frame1.pack(fill="x")
 frame1.config(borderwidth=10,highlightbackground="black", highlightthickness=1)
@@ -180,9 +202,6 @@ entry.pack(side=LEFT, anchor=W, pady=10, padx=10)
 button = Button(frame1, text="Mas informacion", bg="yellow")
 button.pack(side=RIGHT, anchor=E, pady=10, padx=10)
 
-#Creo el arbol donde se mostrara la informacion.
-columns = ['Descripcion', 'Codigo articulo','Stock expedicion', 'Stock reservado', 
-            'Maximas bolsas posibles en linea','Fecha programada' ,'Cantidad']
 
 tree = ttk.Treeview(root)
 tree["columns"] = columns
