@@ -28,14 +28,10 @@ class ArticuloS(Articulo):
     
     def agregarHijo(self,hijo=[]):
         self.hijos.append(hijo)
-        #print("hijos en agregar: ", self.hijos)
     
     def agregarNieto(self,nieto=[]):
         self.nietos.append(nieto)
-        #print("nietos en agregar: ", self.nietos)
 
-    def getHijos(self):
-        return [self.hijos]
 
 
 class ArticuloL(Articulo):

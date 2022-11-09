@@ -1,12 +1,5 @@
-
-from distutils.command.config import config
-from hashlib import new
-from operator import truediv
-from time import process_time_ns
 from tkinter import *
 from tkinter import ttk
-from traceback import print_tb
-from turtle import heading, left, right, st, width
 import pyodbc
 import articulo as art
 
@@ -14,7 +7,6 @@ import articulo as art
 root = Tk()
 root.geometry('1430x700')
 root.resizable(0,0)
-#root.config(bg="")
 root.title('Sox-Control de Stock')
 
 #Columnas para la tabla correspondiente a la ventana princiapl.
@@ -25,6 +17,8 @@ columns2 = ['Insumo en Linea', 'Descripcion de insumo','Necesita linea', 'Stock 
             'Descripcion insumo tejeduria', 'Necesita tejeduria']
 
 listArticulos = []
+
+tree = ttk.Treeview(root)
 
 #---------------------------------------------------------------------------------------------------------------------------------
 #Conexion a la base de datos. 
@@ -70,37 +64,24 @@ def auxQuery():
     conexion.close()
 
     for item in items:
-        auxS = item[0]
-        auxL = item[4]
-        existS = next((e for e in listArticulos if e.cod_articulo==auxS), NONE)
-        #print("resp: ", resp)
+        #Consulta si el articuloS ya fue creado. 
+        existS = next((e for e in listArticulos if e.cod_articulo==item[0]), NONE)
         if existS is NONE:
-            #print("Significa que el s NO existe. Creo el S: ", item[1], item[0])
             artT = art.ArticuloT(item[8], item[9], item[11])
-            #print("Creo el T: ", artT)
             artL = art.ArticuloL(item[4], item[5], item[7], artT)
-            #print("Creo el L: ", artL)
             artS = art.ArticuloS(item[0],item[1],item[2],item[3],item[6],item[10],artL,artT)
             listArticulos.append(artS)
         else:
-            #print('El S existe y es: ', existS.cod_articulo)
-            #existL = existeL(existS.hijos, auxL)
-            existL = next((e for e in existS.hijos if e.cod_articulo==auxL), NONE)
+            #Consulta si el articuloL ya fue creado. 
+            existL = next((e for e in existS.hijos if e.cod_articulo==item[4]), NONE)
             if existL is NONE:
-                #print('El L NO existe. Lo creo: ', item[5])
                 artT = art.ArticuloT(item[8], item[9], item[11])
                 artL = art.ArticuloL(item[4], item[5], item[7], artT)
                 existS.agregarHijo(artL)
-                #print("En el if: ", artL.hijos)
-            #print('Creo el T: ', item[9])
             else:
-                #print("El L existe. Creo el T: ")
                 artT = art.ArticuloT(item[8], item[9], item[11])
                 existS.agregarNieto(artT)
                 existL.agregarHijo(artT)
-                #print("En el else: ", existL.hijos)
-            #print('Los hijos de S son: ', existS.hijos)
-            #print('Los nietos de S son: ', existS.nietos)
     print(len(listArticulos))
 
    
@@ -111,19 +92,13 @@ def filter (*args):
     items = tree.get_children()
     selections = []
     search = entry_var.get()
-    #print("search: ", search)
     for item in items:
-        #print("tree.item(item)", tree.item(item)['values'][0])
         if search.upper() in tree.item(item)['values'][0]:
-            #print("Entro al if")
-            #print("search: ", search)
             search_var = tree.item(item)['values']
-            #print("search var: ", search_var)
             tree.delete(item)
             aux = tree.insert("", 0, values=search_var)
             selections.append(aux)
     tree.selection_set(selections)
-    #print("SELEC: ",selections)
 
 #Vacia el entry para una futura busqueda. Crea una nueva ventana. Deshanilita la ventana principal.
 #Obtiene el codigo de articulo('S') que selecciono el usuario.
@@ -132,16 +107,14 @@ def filter (*args):
 def moreInformation(event):
     print("funciona")
     newWindow = Toplevel(root)
-    newWindow.title('Informacion detallada-Sox')
+    newWindow.title('Sox-Informacion detallada')
     newWindow.geometry('1400x300')    
     newWindow.grab_set()
     item = tree.focus()
     seleccionado = tree.item(item)['values'][1]
-    print('lo que selecciono: ', seleccionado)
     entry.delete(0, END)
     selectionsaux = []
     tree.selection_set(selectionsaux)
-    #Creo el arbol donde se mostrara la informacion.
     tree2 = ttk.Treeview(newWindow)
     tree2["columns"] = columns2
     for i in columns2:
@@ -149,6 +122,12 @@ def moreInformation(event):
         tree2.heading(i, text=i.capitalize())
     tree2["show"] = "headings"
     tree2.pack()
+    tree2.column('Descripcion de insumo',width=300)
+    tree2.column('Descripcion insumo tejeduria',width=300)
+    tree2.column('Necesita linea', width=100, anchor=CENTER)
+    tree2.column('Stock en linea', width=100, anchor=CENTER)
+    tree2.column('Necesita tejeduria', width=100, anchor=CENTER)
+    #Recupero el objeto S para poder consultar dos atributos. 
     articuloS = next((e for e in listArticulos if e.cod_articulo==seleccionado), NONE)
     print("El s: ", articuloS.cod_articulo)
     articuloL = buscarSelect(seleccionado)
@@ -163,16 +142,35 @@ def moreInformation(event):
             tree2.insert("", i, text='', values=(l.cod_articulo, l.descripcion, articuloS.necesitaLinea, l.stockLinea, t.cod_articulo, t.descripcion, articuloS.necesitaTejeduria, t.stockTejeduria))
             i = i + 1
 
-
+  
+    
 #Busca el articulo S seleccionado en la lista de articulos. 
+#Retorna la lista de hijos (articulosL) correspondietes al articuloS. 
 def buscarSelect(select):
     for i in listArticulos:
         if i.cod_articulo == select:
             return i.hijos
             break
 
+#Configuracion del arbol de la ventana principal. 
+def createTree():
+    tree["columns"] = columns
+    for i in columns:
+        tree.column(i)
+        tree.heading(i, text=i.capitalize())
+    tree["show"] = "headings"
+    tree.pack()
+    tree.place(x=50, y=100,width=1300, height=550)
+    tree.column('Descripcion', width=310)
+    tree.column('Codigo articulo', width=150)
+    tree.column('Stock expedicion', width=100, anchor=CENTER)
+    tree.column('Stock reservado', width=100, anchor=CENTER)
+    tree.column('Maximas bolsas posibles en linea', width=160, anchor=CENTER)
+    tree.column('Cantidad', width=100, anchor=CENTER)
+    tree.bind('<Double-1>', moreInformation)
 #-----------------------------------------------------------------------------------------------------------------------------   
 def query():
+    createTree()
     mainQuery()
     auxQuery()
     
@@ -189,26 +187,6 @@ entry_var = StringVar()
 entry = Entry(frame1, textvariable=entry_var)
 entry_var.trace("w", filter)
 entry.pack(side=LEFT, anchor=W, pady=10, padx=10)
-
-button = Button(frame1, text="Mas informacion", bg="yellow")
-button.pack(side=RIGHT, anchor=E, pady=10, padx=10)
-
-
-tree = ttk.Treeview(root)
-tree["columns"] = columns
-for i in columns:
-    tree.column(i)
-    tree.heading(i, text=i.capitalize())
-tree["show"] = "headings"
-tree.pack()
-tree.place(x=50, y=100,width=1300, height=550)
-tree.column('Descripcion', width=310)
-tree.column('Codigo articulo', width=150)
-tree.column('Stock expedicion', width=100, anchor=CENTER)
-tree.column('Stock reservado', width=100, anchor=CENTER)
-tree.column('Maximas bolsas posibles en linea', width=160, anchor=CENTER)
-tree.column('Cantidad', width=100, anchor=CENTER)
-tree.bind('<Double-1>', moreInformation)
 
 #Creo los scrollbars para el arbol en root. 
 scrollbarx = ttk.Scrollbar(root, orient=HORIZONTAL)
