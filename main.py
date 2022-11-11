@@ -11,7 +11,7 @@ root.title('Sox-Control de Stock')
 
 #Columnas para la tabla correspondiente a la ventana princiapl.
 columns = ['Descripcion', 'Codigo articulo','Stock expedicion', 'Stock reservado', 
-            'Maximas bolsas posibles en linea','Fecha programada' ,'Cantidad']
+            'Maximas bolsas posibles en linea','Fecha programada' ,'Cantidad', 'Vendido', 'Pedido a entregar']
 #Columnas para la tabla correspondiente a la segunda ventana (o ventana que brinda mas informacion).
 columns2 = ['Insumo en Linea', 'Descripcion de insumo','Necesita linea', 'Stock en linea', 'Insumo tejeduria', 
             'Descripcion insumo tejeduria', 'Necesita tejeduria', 'Stock tejeduria']
