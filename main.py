@@ -46,7 +46,6 @@ def mainQuery():
     cur.execute(" SELECT * FROM VW_STOCKCOMPLETOARTICULOS ")
     items = cur.fetchall()
     conexion.close()
-
     for item in items:
         #Consulta si el articuloS ya fue creado. 
         existS = next((e for e in listArticulos if e.cod_articulo==item[0]), NONE)
@@ -67,14 +66,6 @@ def mainQuery():
                 existS.agregarNieto(artT)
                 existL.agregarHijo(artT)
     print(len(listArticulos))
-    for i in listArticulos:
-        print(i.cod_articulo)
-        print(i.descripcion)
-        print(i.stock)
-        print(i.stockReservado)
-        print(i.max_bolsas)
-        print(i.fecha)
-        print(i.cant)
 
 #Crea la ventana principal en forma de arbol. Muestra informacion correspondiente a columns.
 def auxQuery():
@@ -131,6 +122,7 @@ def moreInformation(event):
     tree2.column('Necesita linea', width=100, anchor=CENTER)
     tree2.column('Stock en linea', width=100, anchor=CENTER)
     tree2.column('Necesita tejeduria', width=100, anchor=CENTER)
+    tree2.column('Stock tejeduria', width=100, anchor=CENTER)
     #Recupero el objeto S para poder consultar dos atributos. 
     articuloS = next((e for e in listArticulos if e.cod_articulo==seleccionado), NONE)
     print("El s: ", articuloS.cod_articulo)
@@ -145,8 +137,6 @@ def moreInformation(event):
             print("T: ", t.cod_articulo)
             tree2.insert("", i, text='', values=(l.cod_articulo, l.descripcion, articuloS.necesita, l.stock, t.cod_articulo, t.descripcion, l.necesita, t.stock))
             i = i + 1
-
-  
     
 #Busca el articulo S seleccionado en la lista de articulos. 
 #Retorna la lista de hijos (articulosL) correspondietes al articuloS. 
