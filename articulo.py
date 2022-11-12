@@ -22,7 +22,6 @@ class ArticuloS(Articulo):
         super().__init__(cod, des,stockE)
         self.stockReservado = stockR
         self.necesita = necesitaL
-        #self.necesitaTejeduria = necesitaT
         self.hijos = [hijos]
         self.nietos = [nietos]
         self.fecha = fecha_prog
@@ -61,8 +60,8 @@ class ArticuloT(Articulo):
 #Correcciones:
 #Modificar algunos atributos de los objetos (herencia). (Listo).
 #Agregar a la ventana principal columnas: vendido y pedidos a entregar. (Listo).
-#Agregar la nueva consulta.
-#Realizar una sola consulta a la base de datos.
+#Agregar la nueva consulta. (Listo)
+#Realizar una sola consulta a la base de datos. (Listo)
 #Agregar atributos al articulo S: fecha de orden programada, cantidad, maximas bolsas posibles en linea. (Listo).
 #Agregar max bolsas posibles en linea a la nueva consulta. (Listo).
-#Agregar scrollbarx en la nueva ventana. 
+#Agregar scrollbarx en la nueva ventana. (Listo)

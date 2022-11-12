@@ -35,31 +35,15 @@ def connectMe():
     except Exception as ex:
         print(ex)
 
-#Crea la ventana principal en forma de arbol. Muestra informacion correspondiente a columns.
-def mainQuery():
-    conexion = connectMe()
-    cur = conexion.cursor()
-    cur.execute(" SELECT DESCRIPCION, VISTA.COD_ARTICU, CONVERT(INT,STOCKEXPEDICION), CONVERT(INT,STOCKRESERVADO), CONVERT(INT, (MIN(STOCKLINEA) / MAX(NECESITALINEA))) AS MAX_BOLSAS_POSIBLES_LINEA, "+
-                " ORDEN.fecha_prog, orden.cant "+
-                " FROM VW_STOCKCOMPLETOARTICULOS2 VISTA "+
-                " LEFT JOIN VW_ORDENFABRICACIONFUTURASOX2 ORDEN ON VISTA.COD_ARTICU = ORDEN.COD_ARTICU "+
-                " GROUP BY DESCRIPCION, VISTA.COD_ARTICU, STOCKEXPEDICION, STOCKRESERVADO, ORDEN.fecha_prog, orden.cant ")
-    articulos = cur.fetchall()
-    i=0
-    for articulo in articulos:
-        tree.insert("", i, text='', values=(articulo[0], articulo[1],articulo[2], articulo[3], articulo[4],articulo[5], articulo[6]))
-        i = i + 1
-    conexion.close()
-    return articulos
 
 #Realiza la consulta a la base de datos. Por cada fila que retorna la consulta: si no existe el S lo crea. Si existe,
 #Consulta si existe su hijo L. Si existe L, solo crea los T. Si no existe, Crea L y T. 
 #Cada articulo S tiene una lista de hijos correspondientes a los articulos L y una lista de nietos correspondientes a los articulos T.
 #listArticulos es una lista que mantiene todos los objetos correspondientes a los articulos S. 
-def auxQuery():
+def mainQuery():
     conexion = connectMe()
     cur = conexion.cursor()
-    cur.execute(" SELECT * FROM VW_STOCKCOMPLETOARTICULOS2 ")
+    cur.execute(" SELECT * FROM VW_STOCKCOMPLETOARTICULOS ")
     items = cur.fetchall()
     conexion.close()
 
@@ -68,21 +52,37 @@ def auxQuery():
         existS = next((e for e in listArticulos if e.cod_articulo==item[0]), NONE)
         if existS is NONE:
             artT = art.ArticuloT(item[8], item[9], item[11])
-            artL = art.ArticuloL(item[4], item[5], item[7], artT)
-            artS = art.ArticuloS(item[0],item[1],item[2],item[3],item[6],item[10],artL,artT)
+            artL = art.ArticuloL(item[4], item[5], item[7], item[10],artT)
+            artS = art.ArticuloS(item[0],item[1],item[2],item[3],item[6],artL,artT,item[12],item[13],item[14],item[15],item[16])
             listArticulos.append(artS)
         else:
             #Consulta si el articuloL ya fue creado. 
             existL = next((e for e in existS.hijos if e.cod_articulo==item[4]), NONE)
             if existL is NONE:
                 artT = art.ArticuloT(item[8], item[9], item[11])
-                artL = art.ArticuloL(item[4], item[5], item[7], artT)
+                artL = art.ArticuloL(item[4], item[5], item[7], item[10], artT)
                 existS.agregarHijo(artL)
             else:
                 artT = art.ArticuloT(item[8], item[9], item[11])
                 existS.agregarNieto(artT)
                 existL.agregarHijo(artT)
     print(len(listArticulos))
+    for i in listArticulos:
+        print(i.cod_articulo)
+        print(i.descripcion)
+        print(i.stock)
+        print(i.stockReservado)
+        print(i.max_bolsas)
+        print(i.fecha)
+        print(i.cant)
+
+#Crea la ventana principal en forma de arbol. Muestra informacion correspondiente a columns.
+def auxQuery():
+    i=0
+    for articulo in listArticulos:
+        tree.insert("", i, text='', values=(articulo.descripcion, articulo.cod_articulo, articulo.stock, articulo.stockReservado, 
+                                            articulo.max_bolsas, articulo.fecha, articulo.cant))
+        i = i + 1
 
    
 #Se ejecuta cada vez que se ingresa una letra por telclado.
@@ -122,6 +122,10 @@ def moreInformation(event):
         tree2.heading(i, text=i.capitalize())
     tree2["show"] = "headings"
     tree2.pack()
+    scrollbarx = ttk.Scrollbar(newWindow, orient=HORIZONTAL)
+    scrollbarx.configure(command=tree2.xview)
+    tree2.configure(xscrollcommand=scrollbarx.set)
+    scrollbarx.pack(side=BOTTOM, fill="x")
     tree2.column('Descripcion de insumo',width=300)
     tree2.column('Descripcion insumo tejeduria',width=300)
     tree2.column('Necesita linea', width=100, anchor=CENTER)
@@ -139,7 +143,7 @@ def moreInformation(event):
         print("hijos: ", l.hijos)
         for t in l.hijos:
             print("T: ", t.cod_articulo)
-            tree2.insert("", i, text='', values=(l.cod_articulo, l.descripcion, articuloS.necesitaLinea, l.stockLinea, t.cod_articulo, t.descripcion, articuloS.necesitaTejeduria, t.stockTejeduria))
+            tree2.insert("", i, text='', values=(l.cod_articulo, l.descripcion, articuloS.necesita, l.stock, t.cod_articulo, t.descripcion, l.necesita, t.stock))
             i = i + 1
 
   
@@ -173,6 +177,7 @@ def query():
     createTree()
     mainQuery()
     auxQuery()
+    
     
 #-----------------------------------------------------------------------------------------------------------------------------
 #Widgets para la ventana principal. 
