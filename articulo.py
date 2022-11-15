@@ -29,6 +29,9 @@ class ArticuloS(Articulo):
         self.cant = cant
         self.estado = estado
         self.max_bolsas = max_bolsas_linea
+        #self.vendido = vendido
+        #self.pedido = pedido
+        #self.saldo = saldo
     
     def agregarHijo(self,hijo=[]):
         self.hijos.append(hijo)
@@ -65,3 +68,5 @@ class ArticuloT(Articulo):
 #Agregar atributos al articulo S: fecha de orden programada, cantidad, maximas bolsas posibles en linea. (Listo).
 #Agregar max bolsas posibles en linea a la nueva consulta. (Listo).
 #Agregar scrollbarx en la nueva ventana. (Listo)
+#Agregar saldo. (como tercer columna). 
+#Hacer consulta de vendido y pedido a entregar. 

@@ -159,7 +159,7 @@ def createTree():
     tree.column('Codigo articulo', width=150)
     tree.column('Stock expedicion', width=100, anchor=CENTER)
     tree.column('Stock reservado', width=100, anchor=CENTER)
-    tree.column('Maximas bolsas posibles en linea', width=160, anchor=CENTER)
+    tree.column('Maximas bolsas posibles en linea', width=180, anchor=CENTER)
     tree.column('Cantidad', width=100, anchor=CENTER)
     tree.bind('<Double-1>', moreInformation)
 #-----------------------------------------------------------------------------------------------------------------------------   
