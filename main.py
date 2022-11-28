@@ -19,6 +19,9 @@ columns2 = ['Insumo en Linea', 'Descripcion de insumo','Necesita linea', 'Stock 
 listArticulos = []
 
 tree = ttk.Treeview(root)
+tree.tag_configure('uno', foreground='black', background='white')
+#tree.tag_configure('dos', foreground='black', background='#E7E3E1')
+tree.tag_configure('dos', foreground='black', background='#F0EDEC')
 
 #---------------------------------------------------------------------------------------------------------------------------------
 #Conexion a la base de datos. 
@@ -71,8 +74,12 @@ def mainQuery():
 def auxQuery():
     i=0
     for articulo in listArticulos:
-        tree.insert("", i, text='', values=(articulo.descripcion, articulo.cod_articulo, articulo.saldo, articulo.stock, articulo.stockReservado, 
-                                            articulo.max_bolsas, articulo.fecha, articulo.cant,articulo.vendido, articulo.pedido))
+        if(i%2==0):
+            tree.insert("", i, text='', values=(articulo.descripcion, articulo.cod_articulo, articulo.saldo, articulo.stock, articulo.stockReservado, 
+                                            articulo.max_bolsas, articulo.fecha, articulo.cant,articulo.vendido, articulo.pedido),tags='uno')
+        else:
+            tree.insert("", i, text='', values=(articulo.descripcion, articulo.cod_articulo, articulo.saldo, articulo.stock, articulo.stockReservado, 
+                                            articulo.max_bolsas, articulo.fecha, articulo.cant,articulo.vendido, articulo.pedido),tags='dos')
         i = i + 1
 
    
