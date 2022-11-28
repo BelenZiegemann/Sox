@@ -18,7 +18,7 @@ class ArticuloS(Articulo):
     hijos = []
     nietos = []
 
-    def __init__(self, cod, des, stockE, stockR, necesitaL, hijos, nietos, fecha_prog, orden, cant, estado, max_bolsas_linea):
+    def __init__(self, cod, des, stockE, stockR, necesitaL, hijos, nietos, fecha_prog, orden, cant, estado, max_bolsas_linea,vendido,pedido,saldo):
         super().__init__(cod, des,stockE)
         self.stockReservado = stockR
         self.necesita = necesitaL
@@ -29,9 +29,9 @@ class ArticuloS(Articulo):
         self.cant = cant
         self.estado = estado
         self.max_bolsas = max_bolsas_linea
-        #self.vendido = vendido
-        #self.pedido = pedido
-        #self.saldo = saldo
+        self.vendido = vendido
+        self.pedido = pedido
+        self.saldo = saldo
     
     def agregarHijo(self,hijo=[]):
         self.hijos.append(hijo)
@@ -70,3 +70,9 @@ class ArticuloT(Articulo):
 #Agregar scrollbarx en la nueva ventana. (Listo)
 #Agregar saldo. (como tercer columna). 
 #Hacer consulta de vendido y pedido a entregar. 
+
+
+
+#ARTICULO DE146C SURTIDO DEVUELVE TODOS NULLS.
+#Articulo TE132B IGUAL. 
+#Articulo DE01C TALLE 5 GRISMEL.

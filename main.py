@@ -10,8 +10,8 @@ root.resizable(0,0)
 root.title('Sox-Control de Stock')
 
 #Columnas para la tabla correspondiente a la ventana princiapl.
-columns = ['Descripcion', 'Codigo articulo','Stock expedicion', 'Stock reservado', 
-            'Maximas bolsas posibles en linea','Fecha programada' ,'Cantidad', 'Vendido', 'Pedido a entregar']
+columns = ['Descripcion', 'Codigo articulo','Saldo','Stock expedicion', 'Stock reservado', 
+            'Maximas bolsas posibles','Fecha programada' ,'Cantidad', 'Vendido', 'Pendiente pedido']
 #Columnas para la tabla correspondiente a la segunda ventana (o ventana que brinda mas informacion).
 columns2 = ['Insumo en Linea', 'Descripcion de insumo','Necesita linea', 'Stock en linea', 'Insumo tejeduria', 
             'Descripcion insumo tejeduria', 'Necesita tejeduria', 'Stock tejeduria']
@@ -52,7 +52,7 @@ def mainQuery():
         if existS is NONE:
             artT = art.ArticuloT(item[8], item[9], item[11])
             artL = art.ArticuloL(item[4], item[5], item[7], item[10],artT)
-            artS = art.ArticuloS(item[0],item[1],item[2],item[3],item[6],artL,artT,item[12],item[13],item[14],item[15],item[16])
+            artS = art.ArticuloS(item[0],item[1],item[2],item[3],item[6],artL,artT,item[12],item[13],item[14],item[15],item[16],item[17],item[18],item[19])
             listArticulos.append(artS)
         else:
             #Consulta si el articuloL ya fue creado. 
@@ -71,8 +71,8 @@ def mainQuery():
 def auxQuery():
     i=0
     for articulo in listArticulos:
-        tree.insert("", i, text='', values=(articulo.descripcion, articulo.cod_articulo, articulo.stock, articulo.stockReservado, 
-                                            articulo.max_bolsas, articulo.fecha, articulo.cant))
+        tree.insert("", i, text='', values=(articulo.descripcion, articulo.cod_articulo, articulo.saldo, articulo.stock, articulo.stockReservado, 
+                                            articulo.max_bolsas, articulo.fecha, articulo.cant,articulo.vendido, articulo.pedido))
         i = i + 1
 
    
@@ -117,8 +117,8 @@ def moreInformation(event):
     scrollbarx.configure(command=tree2.xview)
     tree2.configure(xscrollcommand=scrollbarx.set)
     scrollbarx.pack(side=BOTTOM, fill="x")
-    tree2.column('Descripcion de insumo',width=300)
-    tree2.column('Descripcion insumo tejeduria',width=300)
+    tree2.column('Descripcion de insumo',width=290)
+    tree2.column('Descripcion insumo tejeduria',width=290)
     tree2.column('Necesita linea', width=100, anchor=CENTER)
     tree2.column('Stock en linea', width=100, anchor=CENTER)
     tree2.column('Necesita tejeduria', width=100, anchor=CENTER)
@@ -155,12 +155,16 @@ def createTree():
     tree["show"] = "headings"
     tree.pack()
     tree.place(x=50, y=100,width=1300, height=550)
-    tree.column('Descripcion', width=310)
     tree.column('Codigo articulo', width=150)
+    tree.column('Descripcion', width=310)
+    tree.column('Saldo', width=100, anchor=CENTER)
     tree.column('Stock expedicion', width=100, anchor=CENTER)
     tree.column('Stock reservado', width=100, anchor=CENTER)
-    tree.column('Maximas bolsas posibles en linea', width=180, anchor=CENTER)
+    tree.column('Maximas bolsas posibles', width=150, anchor=CENTER)
+    tree.column('Fecha programada', width=160, anchor=CENTER)
     tree.column('Cantidad', width=100, anchor=CENTER)
+    tree.column('Vendido', width=100, anchor=CENTER)
+    tree.column('Pendiente pedido', width=110, anchor=CENTER)
     tree.bind('<Double-1>', moreInformation)
 #-----------------------------------------------------------------------------------------------------------------------------   
 def query():
