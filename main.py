@@ -1,3 +1,4 @@
+from importlib import resources
 from tkinter import *
 from tkinter import ttk
 import pyodbc
@@ -7,6 +8,10 @@ import articulo as art
 root = Tk()
 root.geometry('1430x700')
 root.resizable(0,0)
+#root.iconbitmap('resources/sox.icns')
+#root.iconbitmap('resources/sox.ico')
+#icono = PhotoImage(file='resources/sox.png')
+#root.iconphoto(True, icono)
 root.title('Sox-Control de Stock')
 
 #Columnas para la tabla correspondiente a la ventana princiapl.
@@ -31,7 +36,7 @@ def connectMe():
     password = '#SQLserver2022'
     try:
         connection = pyodbc.connect('DRIVER={ODBC Driver 18 for SQL Server}; SERVER='+server+'; DATABASE='+bd+';UID='+user+'; pwd='+password+';TrustServerCertificate=yes;')
-        print('conexion exitosa')
+        #print('conexion exitosa')
         return connection
 
     except Exception as ex:
@@ -67,7 +72,6 @@ def mainQuery():
                 artT = art.ArticuloT(item[8], item[9], item[11])
                 existS.agregarNieto(artT)
                 existL.agregarHijo(artT)
-    print(len(listArticulos))
 
 #Crea la ventana principal en forma de arbol. Muestra informacion correspondiente a columns.
 #El contador i genera el color intercalado de las filas.
