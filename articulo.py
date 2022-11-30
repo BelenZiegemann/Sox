@@ -1,4 +1,3 @@
-from re import S
 
 class Articulo:
 
@@ -7,11 +6,6 @@ class Articulo:
         self.descripcion = des
         self.stock = stock
 
-    def getCodigo(self):
-        return self.cod_articulo
-    
-    def getDescripcion(self):
-        return self.descripcion
 
 class ArticuloS(Articulo):
 
@@ -59,20 +53,3 @@ class ArticuloT(Articulo):
     def __init__(self, cod, des, stock):
         super().__init__(cod, des, stock)
         
-
-#Correcciones:
-#Modificar algunos atributos de los objetos (herencia). (Listo).
-#Agregar a la ventana principal columnas: vendido y pedidos a entregar. (Listo).
-#Agregar la nueva consulta. (Listo)
-#Realizar una sola consulta a la base de datos. (Listo)
-#Agregar atributos al articulo S: fecha de orden programada, cantidad, maximas bolsas posibles en linea. (Listo).
-#Agregar max bolsas posibles en linea a la nueva consulta. (Listo).
-#Agregar scrollbarx en la nueva ventana. (Listo)
-#Agregar saldo. (como tercer columna). 
-#Hacer consulta de vendido y pedido a entregar. 
-
-
-
-#ARTICULO DE146C SURTIDO DEVUELVE TODOS NULLS.
-#Articulo TE132B IGUAL. 
-#Articulo DE01C TALLE 5 GRISMEL.

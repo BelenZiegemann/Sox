@@ -20,7 +20,6 @@ listArticulos = []
 
 tree = ttk.Treeview(root)
 tree.tag_configure('uno', foreground='black', background='white')
-#tree.tag_configure('dos', foreground='black', background='#E7E3E1')
 tree.tag_configure('dos', foreground='black', background='#F0EDEC')
 
 #---------------------------------------------------------------------------------------------------------------------------------
@@ -71,6 +70,7 @@ def mainQuery():
     print(len(listArticulos))
 
 #Crea la ventana principal en forma de arbol. Muestra informacion correspondiente a columns.
+#El contador i genera el color intercalado de las filas.
 def auxQuery():
     i=0
     for articulo in listArticulos:
@@ -132,19 +132,13 @@ def moreInformation(event):
     tree2.column('Stock tejeduria', width=100, anchor=CENTER)
     #Recupero el objeto S para poder consultar dos atributos. 
     articuloS = next((e for e in listArticulos if e.cod_articulo==seleccionado), NONE)
-    print("El s: ", articuloS.cod_articulo)
     articuloL = buscarSelect(seleccionado)
-    print("devuelta: ", articuloL)
     i = 0
     for l in articuloL:
-        print("hijo insumo: ", l.cod_articulo)
-        print("hijo descrp: ", l.descripcion)
-        print("hijos: ", l.hijos)
         for t in l.hijos:
-            print("T: ", t.cod_articulo)
             tree2.insert("", i, text='', values=(l.cod_articulo, l.descripcion, articuloS.necesita, l.stock, t.cod_articulo, t.descripcion, l.necesita, t.stock))
             i = i + 1
-    
+
 #Busca el articulo S seleccionado en la lista de articulos. 
 #Retorna la lista de hijos (articulosL) correspondietes al articuloS. 
 def buscarSelect(select):
@@ -178,8 +172,7 @@ def query():
     createTree()
     mainQuery()
     auxQuery()
-    
-    
+     
 #-----------------------------------------------------------------------------------------------------------------------------
 #Widgets para la ventana principal. 
 frame1 = Frame(root, height=200)
