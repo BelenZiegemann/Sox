@@ -6,7 +6,7 @@ import articulo as art
 
 
 root = Tk()
-root.geometry('1430x700')
+root.geometry('1350x600')
 root.resizable(0,0)
 #root.iconbitmap('resources/sox.icns')
 #root.iconbitmap('resources/sox.ico')
@@ -110,7 +110,7 @@ def moreInformation(event):
     print("funciona")
     newWindow = Toplevel(root)
     newWindow.title('Sox-Informacion detallada')
-    newWindow.geometry('1400x300')    
+    newWindow.geometry('1350x300')    
     newWindow.grab_set()
     item = tree.focus()
     seleccionado = tree.item(item)['values'][1]
@@ -124,16 +124,17 @@ def moreInformation(event):
         tree2.heading(i, text=i.capitalize())
     tree2["show"] = "headings"
     tree2.pack()
+    tree2.place(x=30, y=20, width=1300, height=700)
     scrollbarx = ttk.Scrollbar(newWindow, orient=HORIZONTAL)
     scrollbarx.configure(command=tree2.xview)
     tree2.configure(xscrollcommand=scrollbarx.set)
     scrollbarx.pack(side=BOTTOM, fill="x")
-    tree2.column('Descripcion de insumo',width=290)
-    tree2.column('Descripcion insumo tejeduria',width=290)
+    tree2.column('Descripcion de insumo',width=250)
+    tree2.column('Descripcion insumo tejeduria',width=250)
     tree2.column('Necesita linea', width=100, anchor=CENTER)
-    tree2.column('Stock en linea', width=100, anchor=CENTER)
+    tree2.column('Stock en linea', width=90, anchor=CENTER)
     tree2.column('Necesita tejeduria', width=100, anchor=CENTER)
-    tree2.column('Stock tejeduria', width=100, anchor=CENTER)
+    tree2.column('Stock tejeduria', width=90, anchor=CENTER)
     #Recupero el objeto S para poder consultar dos atributos. 
     articuloS = next((e for e in listArticulos if e.cod_articulo==seleccionado), NONE)
     articuloL = buscarSelect(seleccionado)
@@ -159,9 +160,9 @@ def createTree():
         tree.heading(i, text=i.capitalize())
     tree["show"] = "headings"
     tree.pack()
-    tree.place(x=50, y=100,width=1300, height=550)
-    tree.column('Codigo articulo', width=150)
-    tree.column('Descripcion', width=310)
+    tree.place(x=40, y=100,width=1250, height=470)
+    tree.column('Codigo articulo', width=130)
+    tree.column('Descripcion', width=250)
     tree.column('Saldo', width=100, anchor=CENTER)
     tree.column('Stock expedicion', width=100, anchor=CENTER)
     tree.column('Stock reservado', width=100, anchor=CENTER)
