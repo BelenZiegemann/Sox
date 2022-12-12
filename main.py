@@ -107,7 +107,6 @@ def filter (*args):
 #Busca la informacion de los 'L' y los 'T' del articulo 'S'.
 #Crea un nuevo Treeview e inserta la nueva informacion. 
 def moreInformation(event):
-    print("funciona")
     newWindow = Toplevel(root)
     newWindow.title('Sox-Informacion detallada')
     newWindow.geometry('1350x300')    
