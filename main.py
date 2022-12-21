@@ -16,12 +16,13 @@ root.title('Sox-Control de Stock')
 
 #Columnas para la tabla correspondiente a la ventana princiapl.
 columns = ['Descripcion', 'Codigo articulo','Saldo','Stock expedicion', 'Stock reservado', 
-            'Maximas bolsas posibles','Fecha programada' ,'Cantidad', 'Vendido', 'Pendiente pedido']
+            'Maximas bolsas en linea', 'Maximas bolsas en tejeduria', 'Fecha programada' ,'Cantidad', 'Vendido', 'Pendiente pedido']
 #Columnas para la tabla correspondiente a la segunda ventana (o ventana que brinda mas informacion).
 columns2 = ['Insumo en Linea', 'Descripcion de insumo','Necesita linea', 'Stock en linea', 'Insumo tejeduria', 
             'Descripcion insumo tejeduria', 'Necesita tejeduria', 'Stock tejeduria']
 
 listArticulos = []
+listArticulosAux = []
 
 tree = ttk.Treeview(root)
 tree.tag_configure('uno', foreground='black', background='white')
@@ -59,7 +60,7 @@ def mainQuery():
         if existS is NONE:
             artT = art.ArticuloT(item[8], item[9], item[11])
             artL = art.ArticuloL(item[4], item[5], item[7], item[10],artT)
-            artS = art.ArticuloS(item[0],item[1],item[2],item[3],item[6],artL,artT,item[12],item[13],item[14],item[15],item[16],item[17],item[18],item[19])
+            artS = art.ArticuloS(item[0],item[1],item[2],item[3],item[6],artL,artT,item[12],item[13],item[14],item[15],item[16],item[17],item[18],item[19],item[20])
             listArticulos.append(artS)
         else:
             #Consulta si el articuloL ya fue creado. 
@@ -78,13 +79,9 @@ def mainQuery():
 def auxQuery():
     i=0
     for articulo in listArticulos:
-        if(i%2==0):
             tree.insert("", i, text='', values=(articulo.descripcion, articulo.cod_articulo, articulo.saldo, articulo.stock, articulo.stockReservado, 
-                                            articulo.max_bolsas, articulo.fecha, articulo.cant,articulo.vendido, articulo.pedido),tags='uno')
-        else:
-            tree.insert("", i, text='', values=(articulo.descripcion, articulo.cod_articulo, articulo.saldo, articulo.stock, articulo.stockReservado, 
-                                            articulo.max_bolsas, articulo.fecha, articulo.cant,articulo.vendido, articulo.pedido),tags='dos')
-        i = i + 1
+                                            articulo.max_bolsasL, articulo.max_bolsasT, articulo.fecha, articulo.cant,articulo.vendido, articulo.pedido))
+            i = i + 1
 
    
 #Se ejecuta cada vez que se ingresa una letra por telclado.
@@ -112,10 +109,12 @@ def moreInformation(event):
     newWindow.geometry('1350x300')    
     newWindow.grab_set()
     item = tree.focus()
+    print(item)
     seleccionado = tree.item(item)['values'][1]
-    entry.delete(0, END)
-    selectionsaux = []
-    tree.selection_set(selectionsaux)
+    print(seleccionado)
+    #entry.delete(0, END)
+    #selectionsaux = []
+    #tree.selection_set(selectionsaux)
     tree2 = ttk.Treeview(newWindow)
     tree2["columns"] = columns2
     for i in columns2:
@@ -165,7 +164,8 @@ def createTree():
     tree.column('Saldo', width=100, anchor=CENTER)
     tree.column('Stock expedicion', width=100, anchor=CENTER)
     tree.column('Stock reservado', width=100, anchor=CENTER)
-    tree.column('Maximas bolsas posibles', width=150, anchor=CENTER)
+    tree.column('Maximas bolsas en linea', width=150, anchor=CENTER)
+    tree.column('Maximas bolsas en tejeduria', width=150, anchor=CENTER)
     tree.column('Fecha programada', width=160, anchor=CENTER)
     tree.column('Cantidad', width=100, anchor=CENTER)
     tree.column('Vendido', width=100, anchor=CENTER)

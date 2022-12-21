@@ -12,7 +12,7 @@ class ArticuloS(Articulo):
     hijos = []
     nietos = []
 
-    def __init__(self, cod, des, stockE, stockR, necesitaL, hijos, nietos, fecha_prog, orden, cant, estado, max_bolsas_linea,vendido,pedido,saldo):
+    def __init__(self, cod, des, stockE, stockR, necesitaL, hijos, nietos, fecha_prog, orden, cant, estado, max_bolsas_linea, max_bolsas_tejeduria,vendido,pedido,saldo):
         super().__init__(cod, des,stockE)
         self.stockReservado = stockR
         self.necesita = necesitaL
@@ -22,7 +22,8 @@ class ArticuloS(Articulo):
         self.orden = orden
         self.cant = cant
         self.estado = estado
-        self.max_bolsas = max_bolsas_linea
+        self.max_bolsasL = max_bolsas_linea
+        self.max_bolsasT = max_bolsas_tejeduria
         self.vendido = vendido
         self.pedido = pedido
         self.saldo = saldo
