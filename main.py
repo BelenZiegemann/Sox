@@ -88,16 +88,26 @@ def auxQuery():
 #Recorre todo el arbol de articulos buscando las coincidencias en la variable 'descripcion'
 # y los posiciona al principio del arbol, ademas de destacar toda la fila con otro color. 
 def filter (*args):
-    items = tree.get_children()
-    selections = []
     search = entry_var.get()
+    if search == ' ':
+        listArticulosAux = listArticulos
+    else:
+        listArticulosAux = []
+        for item in listArticulos:
+            if search.upper() in item.getStock():
+                listArticulosAux.append(item)
+    update(listArticulosAux)
+
+def update(list):
+    items = tree.get_children()
     for item in items:
-        if search.upper() in tree.item(item)['values'][0]:
-            search_var = tree.item(item)['values']
-            tree.delete(item)
-            aux = tree.insert("", 0, values=search_var)
-            selections.append(aux)
-    tree.selection_set(selections)
+        tree.delete(item)
+    i = 0
+    for b in list:
+        tree.insert("", i, text='', values=(b.descripcion, b.cod_articulo, b.saldo, b.stock, b.stockReservado, 
+                                            b.max_bolsasL, b.max_bolsasT, b.fecha, b.cant, b.vendido, b.pedido))
+        i = i + 1
+
 
 #Vacia el entry para una futura busqueda. Crea una nueva ventana. Deshanilita la ventana principal.
 #Obtiene el codigo de articulo('S') que selecciono el usuario.
@@ -106,12 +116,10 @@ def filter (*args):
 def moreInformation(event):
     newWindow = Toplevel(root)
     newWindow.title('Sox-Informacion detallada')
-    newWindow.geometry('1350x300')    
+    newWindow.geometry('1350x350')    
     newWindow.grab_set()
     item = tree.focus()
-    print(item)
     seleccionado = tree.item(item)['values'][1]
-    print(seleccionado)
     #entry.delete(0, END)
     #selectionsaux = []
     #tree.selection_set(selectionsaux)

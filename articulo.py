@@ -6,6 +6,8 @@ class Articulo:
         self.descripcion = des
         self.stock = stock
 
+    def getStock(self):
+        return self.descripcion
 
 class ArticuloS(Articulo):
 
