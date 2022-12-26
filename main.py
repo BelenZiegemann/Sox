@@ -8,10 +8,6 @@ import articulo as art
 root = Tk()
 root.geometry('1350x600')
 root.resizable(0,0)
-#root.iconbitmap('resources/sox.icns')
-#root.iconbitmap('resources/sox.ico')
-#icono = PhotoImage(file='resources/sox.png')
-#root.iconphoto(True, icono)
 root.title('Sox-Control de Stock')
 
 #Columnas para la tabla correspondiente a la ventana princiapl.
@@ -25,8 +21,6 @@ listArticulos = []
 listArticulosAux = []
 
 tree = ttk.Treeview(root)
-tree.tag_configure('uno', foreground='black', background='white')
-tree.tag_configure('dos', foreground='black', background='#F0EDEC')
 
 #---------------------------------------------------------------------------------------------------------------------------------
 #Conexion a la base de datos. 
@@ -85,8 +79,8 @@ def auxQuery():
 
    
 #Se ejecuta cada vez que se ingresa una letra por telclado.
-#Recorre todo el arbol de articulos buscando las coincidencias en la variable 'descripcion'
-# y los posiciona al principio del arbol, ademas de destacar toda la fila con otro color. 
+#Si el usuario no ingresa nada, se mantiene el arbol.
+#Si no, almacena en una lista auxiliar las coincidencias y luego actualiza el arbol. 
 def filter (*args):
     search = entry_var.get()
     if search == ' ':
@@ -98,6 +92,7 @@ def filter (*args):
                 listArticulosAux.append(item)
     update(listArticulosAux)
 
+#Elimina todo el arbol y muestra solo aquellos objetos que coinciden segun la busqueda del usuario. 
 def update(list):
     items = tree.get_children()
     for item in items:
@@ -120,9 +115,6 @@ def moreInformation(event):
     newWindow.grab_set()
     item = tree.focus()
     seleccionado = tree.item(item)['values'][1]
-    #entry.delete(0, END)
-    #selectionsaux = []
-    #tree.selection_set(selectionsaux)
     tree2 = ttk.Treeview(newWindow)
     tree2["columns"] = columns2
     for i in columns2:
