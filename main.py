@@ -23,7 +23,7 @@ listArticulosAux = []
 
 tree = ttk.Treeview(root)
 style = ttk.Style()
-style.configure("Treeview.Heading", font=('Calibri', 12,'bold'))
+style.configure("Treeview.Heading", font=('Calibri', 11,'bold'))
 tree.tag_configure('uno', foreground='black', background='white')
 tree.tag_configure('dos', foreground='black', background='#F0EDEC')
 
@@ -144,7 +144,7 @@ def moreInformation(event):
     tree2.column('Descripcion insumo tejeduria',width=250)
     tree2.column('Necesita linea', width=100, anchor=CENTER)
     tree2.column('Stock en linea', width=90, anchor=CENTER)
-    tree2.column('Necesita tejeduria', width=100, anchor=CENTER)
+    tree2.column('Necesita tejeduria', width=110, anchor=CENTER)
     tree2.column('Stock tejeduria', width=90, anchor=CENTER)
     #Recupero el objeto S para poder consultar dos atributos. 
     articuloS = next((e for e in listArticulos if e.cod_articulo==seleccionado), NONE)
@@ -163,6 +163,11 @@ def buscarSelect(select):
             return i.hijos
             break
 
+#Evita que el usuario pueda modificar el ancho de las columnas. 
+def handle_click(event):
+    if tree.identify_region(event.x, event.y) == "separator":
+       return "break"
+
 #Configuracion del arbol de la ventana principal. 
 def createTree():
     tree["columns"] = columns
@@ -178,12 +183,13 @@ def createTree():
     tree.column('Stock expedicion', width=100, anchor=CENTER)
     tree.column('Stock reservado', width=100, anchor=CENTER)
     tree.column('Maximas bolsas en linea', width=150, anchor=CENTER)
-    tree.column('Maximas bolsas en tejeduria', width=150, anchor=CENTER)
+    tree.column('Maximas bolsas en tejeduria', width=160, anchor=CENTER)
     tree.column('Fecha programada', width=160, anchor=CENTER)
     tree.column('Cantidad', width=100, anchor=CENTER)
     tree.column('Vendido', width=100, anchor=CENTER)
     tree.column('Pendiente pedido', width=110, anchor=CENTER)
     tree.bind('<Double-1>', moreInformation)
+    tree.bind('<Button-1>', handle_click)
 #-----------------------------------------------------------------------------------------------------------------------------   
 def query():
     createTree()
