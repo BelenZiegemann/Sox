@@ -1,4 +1,5 @@
 from importlib import resources
+from sys import maxsize
 from tkinter import *
 from tkinter import ttk
 import pyodbc
@@ -21,6 +22,10 @@ listArticulos = []
 listArticulosAux = []
 
 tree = ttk.Treeview(root)
+style = ttk.Style()
+style.configure("Treeview.Heading", font=('Calibri', 12,'bold'))
+tree.tag_configure('uno', foreground='black', background='white')
+tree.tag_configure('dos', foreground='black', background='#F0EDEC')
 
 #---------------------------------------------------------------------------------------------------------------------------------
 #Conexion a la base de datos. 
@@ -73,9 +78,13 @@ def mainQuery():
 def auxQuery():
     i=0
     for articulo in listArticulos:
+        if(i%2==0):
             tree.insert("", i, text='', values=(articulo.descripcion, articulo.cod_articulo, articulo.saldo, articulo.stock, articulo.stockReservado, 
-                                            articulo.max_bolsasL, articulo.max_bolsasT, articulo.fecha, articulo.cant,articulo.vendido, articulo.pedido))
-            i = i + 1
+                                            articulo.max_bolsasL, articulo.max_bolsasT, articulo.fecha, articulo.cant,articulo.vendido, articulo.pedido),tags='uno')
+        else:
+            tree.insert("", i, text='', values=(articulo.descripcion, articulo.cod_articulo, articulo.saldo, articulo.stock, articulo.stockReservado, 
+                                            articulo.max_bolsasL, articulo.max_bolsasT, articulo.fecha, articulo.cant,articulo.vendido, articulo.pedido),tags='dos')
+        i = i + 1
 
    
 #Se ejecuta cada vez que se ingresa una letra por telclado.
@@ -99,8 +108,12 @@ def update(list):
         tree.delete(item)
     i = 0
     for b in list:
-        tree.insert("", i, text='', values=(b.descripcion, b.cod_articulo, b.saldo, b.stock, b.stockReservado, 
-                                            b.max_bolsasL, b.max_bolsasT, b.fecha, b.cant, b.vendido, b.pedido))
+        if(i%2==0):
+            tree.insert("", i, text='', values=(b.descripcion, b.cod_articulo, b.saldo, b.stock, b.stockReservado, 
+                                                b.max_bolsasL, b.max_bolsasT, b.fecha, b.cant, b.vendido, b.pedido), tags='uno')
+        else:
+            tree.insert("", i, text='', values=(b.descripcion, b.cod_articulo, b.saldo, b.stock, b.stockReservado, 
+                                                b.max_bolsasL, b.max_bolsasT, b.fecha, b.cant, b.vendido, b.pedido), tags='dos')
         i = i + 1
 
 
@@ -111,7 +124,7 @@ def update(list):
 def moreInformation(event):
     newWindow = Toplevel(root)
     newWindow.title('Sox-Informacion detallada')
-    newWindow.geometry('1350x350')    
+    newWindow.geometry('1350x300')    
     newWindow.grab_set()
     item = tree.focus()
     seleccionado = tree.item(item)['values'][1]
@@ -159,8 +172,8 @@ def createTree():
     tree["show"] = "headings"
     tree.pack()
     tree.place(x=40, y=100,width=1250, height=470)
-    tree.column('Codigo articulo', width=130)
-    tree.column('Descripcion', width=250)
+    tree.column('Codigo articulo', minwidth=130, width=130)
+    tree.column('Descripcion', minwidth=300, width=300, stretch=FALSE)
     tree.column('Saldo', width=100, anchor=CENTER)
     tree.column('Stock expedicion', width=100, anchor=CENTER)
     tree.column('Stock reservado', width=100, anchor=CENTER)
@@ -204,7 +217,6 @@ scrollbary.pack(side= RIGHT, fill=Y, ipady=40)
 
 
 query()
-
 
 root.mainloop()
 
