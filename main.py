@@ -12,8 +12,8 @@ root.resizable(0,0)
 root.title('Sox-Control de Stock')
 
 #Columnas para la tabla correspondiente a la ventana princiapl.
-columns = ['Descripcion', 'Codigo articulo','Saldo','Stock expedicion', 'Stock reservado', 
-            'Maximas bolsas en linea', 'Maximas bolsas en tejeduria', 'Fecha programada' ,'Cantidad', 'Vendido', 'Pendiente pedido']
+columns = ['Descripcion','Saldo','Ventas trim','Ventas año','Pend ped','Expedicion', 'Reservado', 
+            'Max linea', 'Max tejeduria', 'Fecha programada' ,'Cant prog','Codigo articulo']
 #Columnas para la tabla correspondiente a la segunda ventana (o ventana que brinda mas informacion).
 columns2 = ['Insumo en Linea', 'Descripcion de insumo','Necesita linea', 'Stock en linea', 'Insumo tejeduria', 
             'Descripcion insumo tejeduria', 'Necesita tejeduria', 'Stock tejeduria']
@@ -79,11 +79,11 @@ def auxQuery():
     i=0
     for articulo in listArticulos:
         if(i%2==0):
-            tree.insert("", i, text='', values=(articulo.descripcion, articulo.cod_articulo, articulo.saldo, articulo.stock, articulo.stockReservado, 
-                                            articulo.max_bolsasL, articulo.max_bolsasT, articulo.fecha, articulo.cant,articulo.vendido, articulo.pedido),tags='uno')
+            tree.insert("", i, text='', values=(articulo.descripcion, articulo.saldo, articulo.vendido, articulo.vendidoAnio, articulo.pedido, articulo.stock, articulo.stockReservado, 
+                                            articulo.max_bolsasL, articulo.max_bolsasT, articulo.fecha, articulo.cant, articulo.cod_articulo,),tags='uno')
         else:
-            tree.insert("", i, text='', values=(articulo.descripcion, articulo.cod_articulo, articulo.saldo, articulo.stock, articulo.stockReservado, 
-                                            articulo.max_bolsasL, articulo.max_bolsasT, articulo.fecha, articulo.cant,articulo.vendido, articulo.pedido),tags='dos')
+            tree.insert("", i, text='', values=(articulo.descripcion, articulo.saldo, articulo.vendido, articulo.vendidoAnio, articulo.pedido, articulo.stock, articulo.stockReservado, 
+                                            articulo.max_bolsasL, articulo.max_bolsasT, articulo.fecha, articulo.cant, articulo.cod_articulo,),tags='dos')
         i = i + 1
 
    
@@ -109,11 +109,11 @@ def update(list):
     i = 0
     for b in list:
         if(i%2==0):
-            tree.insert("", i, text='', values=(b.descripcion, b.cod_articulo, b.saldo, b.stock, b.stockReservado, 
-                                                b.max_bolsasL, b.max_bolsasT, b.fecha, b.cant, b.vendido, b.pedido), tags='uno')
+            tree.insert("", i, text='', values=(b.descripcion, b.saldo, b.stock, b.stockReservado, 
+                                                b.max_bolsasL, b.max_bolsasT, b.fecha, b.cant, b.vendido, b.pedido, b.cod_articulo,), tags='uno')
         else:
-            tree.insert("", i, text='', values=(b.descripcion, b.cod_articulo, b.saldo, b.stock, b.stockReservado, 
-                                                b.max_bolsasL, b.max_bolsasT, b.fecha, b.cant, b.vendido, b.pedido), tags='dos')
+            tree.insert("", i, text='', values=(b.descripcion, b.saldo, b.stock, b.stockReservado, 
+                                                b.max_bolsasL, b.max_bolsasT, b.fecha, b.cant, b.vendido, b.pedido, b.cod_articulo,), tags='dos')
         i = i + 1
 
 
@@ -177,17 +177,18 @@ def createTree():
     tree["show"] = "headings"
     tree.pack()
     tree.place(x=40, y=100,width=1250, height=470)
-    tree.column('Codigo articulo', minwidth=130, width=130)
-    tree.column('Descripcion', minwidth=300, width=300, stretch=FALSE)
+    tree.column('Descripcion', minwidth=300, width=300)
     tree.column('Saldo', width=100, anchor=CENTER)
-    tree.column('Stock expedicion', width=100, anchor=CENTER)
-    tree.column('Stock reservado', width=100, anchor=CENTER)
-    tree.column('Maximas bolsas en linea', width=150, anchor=CENTER)
-    tree.column('Maximas bolsas en tejeduria', width=160, anchor=CENTER)
+    tree.column('Ventas trim', width=100, anchor=CENTER)
+    tree.column('Ventas año', width=100, anchor=CENTER)
+    tree.column('Pend ped', width=110, anchor=CENTER)
+    tree.column('Expedicion', width=100, anchor=CENTER)
+    tree.column('Reservado', width=100, anchor=CENTER)
+    tree.column('Max linea', width=150, anchor=CENTER)
+    tree.column('Max tejeduria', width=160, anchor=CENTER)
     tree.column('Fecha programada', width=160, anchor=CENTER)
-    tree.column('Cantidad', width=100, anchor=CENTER)
-    tree.column('Vendido', width=100, anchor=CENTER)
-    tree.column('Pendiente pedido', width=110, anchor=CENTER)
+    tree.column('Cant prog', width=100, anchor=CENTER)
+    tree.column('Codigo articulo', minwidth=130, width=130)
     tree.bind('<Double-1>', moreInformation)
     tree.bind('<Button-1>', handle_click)
 #-----------------------------------------------------------------------------------------------------------------------------   

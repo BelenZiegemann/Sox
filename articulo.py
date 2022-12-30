@@ -14,7 +14,7 @@ class ArticuloS(Articulo):
     hijos = []
     nietos = []
 
-    def __init__(self, cod, des, stockE, stockR, necesitaL, hijos, nietos, fecha_prog, orden, cant, estado, max_bolsas_linea, max_bolsas_tejeduria,vendido,pedido,saldo):
+    def __init__(self, cod, des, stockE, stockR, necesitaL, hijos, nietos, fecha_prog, orden, cant, estado, max_bolsas_linea, max_bolsas_tejeduria,vendido,pedido,saldo, vendidoUltimo):
         super().__init__(cod, des,stockE)
         self.stockReservado = stockR
         self.necesita = necesitaL
@@ -29,6 +29,7 @@ class ArticuloS(Articulo):
         self.vendido = vendido
         self.pedido = pedido
         self.saldo = saldo
+        self.vendidoAnio = vendidoUltimo
     
     def agregarHijo(self,hijo=[]):
         self.hijos.append(hijo)
