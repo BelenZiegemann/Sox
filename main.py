@@ -48,7 +48,7 @@ listArticulosAux = []
 
 tree = ttk.Treeview(root)
 style = ttk.Style()
-style.configure("Treeview.Heading", font=('Calibri', 11, 'bold'))
+style.configure("Treeview.Heading", font=('Calibri', 10, 'bold'))
 tree.tag_configure('uno', foreground='black', background='white')
 tree.tag_configure('dos', foreground='black', background='#F0EDEC')
 
@@ -133,7 +133,7 @@ def filter(*args):
     else:
         listArticulosAux = []
         for item in listArticulos:
-            if search.upper() in item.getStock():
+            if search.upper() in item.getDescripcion():
                 listArticulosAux.append(item)
     update(listArticulosAux)
 
@@ -188,7 +188,7 @@ def moreInformation(event):
             tree2.insert("", i, text='', values=(l.cod_articulo, l.descripcion, articuloS.necesitaL, l.stockExpedicion,
                                                  t.cod_articulo, t.descripcion, l.necesitaT, t.stockExpedicion))
             i = i + 1
-    tree2.bind('<Button-1>', handle_click)
+    
 # Busca el articulo S seleccionado en la lista de articulos.
 # Retorna la lista de hijos (articulosL) correspondietes al articuloS.
 
@@ -238,6 +238,7 @@ def query():
     createTree()
     mainQuery()
     insertTree(listArticulos)
+    #root.after(30000, query)
      
 # -----------------------------------------------------------------------------------------------------------------------------
 # Widgets para la ventana principal.
@@ -268,5 +269,8 @@ scrollbary.pack(side=RIGHT, fill=Y, ipady=40)
 
 
 query()
+
+# Cierra la ventana en 10 segundos. 
+# root.after(10000, root.destroy)
 
 root.mainloop()
