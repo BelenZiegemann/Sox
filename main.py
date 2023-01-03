@@ -25,8 +25,14 @@ DESCRIP_INSUMO_TEJ = 5
 NECESITA_TEJEDURIA = 6
 STOCK_TEJEDURIA = 7
 
+ANCHO = 1350
+ALTO = 600
+
+
 root = Tk()
-root.geometry('1350x600')
+x = int((root.winfo_screenwidth()/2)-(ANCHO/2))
+y = int((root.winfo_screenheight()/2)-(ALTO/2))
+root.geometry("{}x{}+{}+{}".format(ANCHO, ALTO, x, y))
 root.resizable(FALSE, FALSE)
 root.title('Sox-Control de Stock')
 
@@ -150,7 +156,7 @@ def update(list):
 def moreInformation(event):
     newWindow = Toplevel(root)
     newWindow.title('Sox-Informacion detallada')
-    newWindow.geometry('1350x300')    
+    newWindow.geometry("{}x{}+{}+{}".format(ANCHO, 300, x, y))  
     newWindow.grab_set()
     item = tree.focus()
     seleccionado = tree.item(item)['values'][CODIGO_ARTICULO]
