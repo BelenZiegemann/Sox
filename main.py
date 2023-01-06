@@ -59,7 +59,7 @@ def main():
     createTree()
     query()
     insertTree(listArticulos)
-    #root.after(30000, query)
+    #root.after(30000, main)
 
 # Configuracion del arbol de la ventana principal.
 # Se ajusta el ancho de las columnas. 
