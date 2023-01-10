@@ -124,7 +124,7 @@ def query():
             artT = art.ArticuloT(item[8], item[9], item[11])
             artL = art.ArticuloL(item[4], item[5], item[7], item[10], artT)
             artS = art.ArticuloS(item[0], item[1], item[2], item[3], item[6], artL, artT, item[12], item[13], item[14],
-                                 item[15], item[16], item[17], item[18], item[19], item[20], 0)
+                                 item[15], item[16], item[17], item[18], item[19], item[20], item[21])
             listArticulos.append(artS)
         else:
             # Consulta si el articuloL ya fue creado.
