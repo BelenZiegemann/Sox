@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from turtle import back
 import pyodbc
 import articulo as art
 
@@ -37,6 +38,7 @@ y = int((root.winfo_screenheight()/2)-(ALTO/2))
 root.geometry("{}x{}+{}+{}".format(ANCHO, ALTO, x, y))
 root.resizable(FALSE, FALSE)
 root.title('Sox-Control de Stock')
+root.configure(background='#F4EEFF')
 
 # Columnas para la tabla correspondiente a la ventana princiapl.
 columns = ['Descripcion', 'Saldo', 'Ventas trim', 'Ventas año', 'Pend ped', 'Expedicion', 'Reservado',
@@ -59,7 +61,7 @@ def main():
     createTree()
     query()
     insertTree(listArticulos)
-    #root.after(30000, main)
+
 
 # Configuracion del arbol de la ventana principal.
 # Se ajusta el ancho de las columnas. 
@@ -204,7 +206,12 @@ def moreInformation(event):
         tree2.heading(i, text=i.capitalize())
     tree2["show"] = "headings"
     tree2.pack()
-    tree2.place(x=30, y=20, width=1300, height=700)
+    tree2.place(x=30, y=10, width=1300, height=260)
+    style = ttk.Style()
+    style.configure("Treeview.Heading", font=('Calibri', 10, 'bold'), fg='#2C333')
+    style.map('Treeview', foreground=fixed_map('foreground'), background=fixed_map('background'))
+    tree2.tag_configure('uno', foreground='#2C3333', background='#F4EEFF')
+    tree2.tag_configure('dos', foreground='#2C3333', background='#DCD6F7')
     scrollbarx = ttk.Scrollbar(newWindow, orient=HORIZONTAL)
     scrollbarx.configure(command=tree2.xview)
     tree2.configure(xscrollcommand=scrollbarx.set)
@@ -221,8 +228,12 @@ def moreInformation(event):
     i = 0
     for l in articuloL:
         for t in l.hijos:
-            tree2.insert("", i, text='', values=(l.cod_articulo, l.descripcion, articuloS.necesitaL, l.stockExpedicion,
-                                                 t.cod_articulo, t.descripcion, l.necesitaT, t.stockExpedicion))
+            if i % 2 == 0:
+                tree2.insert("", i, text='', values=(l.cod_articulo, l.descripcion, articuloS.necesitaL, l.stockExpedicion,
+                                                    t.cod_articulo, t.descripcion, l.necesitaT, t.stockExpedicion), tags='uno')
+            else:
+                tree2.insert("", i, text='', values=(l.cod_articulo, l.descripcion, articuloS.necesitaL, l.stockExpedicion,
+                                                    t.cod_articulo, t.descripcion, l.necesitaT, t.stockExpedicion), tags='dos')
             i = i + 1
     
 # Busca el articulo S seleccionado en la lista de articulos.
@@ -241,29 +252,37 @@ def handle_click(event):
     if tree.identify_region(event.x, event.y) == "separator" or tree.identify_region(event.x, event.y) == "heading":
         return "break"
 
+
+def actualizar():
+    listArticulos.clear()
+    main()
+
 # -----------------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------
 tree = ttk.Treeview(root)
 style = ttk.Style()
-style.configure("Treeview.Heading", font=('Calibri', 10, 'bold'))
+style.configure("Treeview.Heading", font=('Calibri', 10, 'bold'), fg='#2C3333')
 style.map('Treeview', foreground=fixed_map('foreground'), background=fixed_map('background'))
-tree.tag_configure('uno', foreground='#2C2727', background='white')
-tree.tag_configure('dos', foreground='#2C2727', background='#F0EDEC')
+tree.tag_configure('uno', foreground='#2C3333', background='#F4EEFF')
+tree.tag_configure('dos', foreground='#2C3333', background='#DCD6F7')
 
 # Widgets para la ventana principal.
 
 
-frame1 = Frame(root, height=200)
+frame1 = Frame(root, height=200, bg='#F4EEFF')
 frame1.pack(fill="x")
 frame1.config(borderwidth=10, highlightbackground="black", highlightthickness=1)
 # Label, entry y button para frame1
-label = Label(frame1, text="Ingresar codigo", font=('Calibri', 11, 'bold'))
+label = Label(frame1, text="Ingresar codigo", font=('Calibri', 11, 'bold'), fg='#2C3333', bg='#F4EEFF')
 label.pack(side=LEFT, anchor=W, pady=10, padx=28)
 
 entry_var = StringVar()
 entry = Entry(frame1, textvariable=entry_var)
 entry_var.trace("w", filter)
 entry.pack(side=LEFT, anchor=W, pady=10, padx=10)
+
+boton = Button(frame1, width=12, bg='#A6B1E1', fg='#2C3333', text="Actualizar", font=('Calibri', 11, 'bold'), command=actualizar)
+boton.pack(side=RIGHT, anchor=W, pady=20, padx=50)
 
 # Creo los scrollbars para el arbol en root.
 scrollbarx = ttk.Scrollbar(root, orient=HORIZONTAL)
